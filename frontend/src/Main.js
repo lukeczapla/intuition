@@ -1,6 +1,6 @@
 import { useLocation, useHistory, withRouter, BrowserRouter, Router, Switch, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import Knowledge from './Knowledge.js';
+import Intuition from './Intuition.js';
 
 const Main = (props) => {
   const [pageMax, setPageMax] = useState(0);
@@ -62,7 +62,7 @@ const Main = (props) => {
     };
   });
 
-  return (<Knowledge {...props} state={state} onMove={handleChange} />);
+  return (<Intuition {...props} state={state} onMove={handleChange} />);
 
 }
 

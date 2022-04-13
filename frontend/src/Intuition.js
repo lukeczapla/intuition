@@ -33,14 +33,14 @@ import ErrorModal from './components/Modals/ErrorModal';
 import SubmitModal from './components/Modals/SubmitModal';
 import * as aa from './components/AminoAcids.js';
 
-import './Knowledge.scss';
+import './Intuition.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import endpoint from './endpoint.js';
 import styles from './SearchBar.module.css';
 
 // spoof prefix = https://cors-anywhere.herokuapp.com/
 
-const Knowledge = (props) => {
+const Intuition = (props) => {
 
   const [searchText, setSearchText] = useState('');
   const [modalShow, setModalShow] = useState(false);
@@ -1137,4 +1137,4 @@ const Knowledge = (props) => {
 
 };
 
-export default Knowledge;
+export default Intuition;

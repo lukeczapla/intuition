@@ -1,5 +1,5 @@
 
-const endpoint = 'http://localhost:7050/knowledge';
+const endpoint = 'http://localhost:7050/intuition';
 //const endpoint = '';
 
 export default endpoint;
