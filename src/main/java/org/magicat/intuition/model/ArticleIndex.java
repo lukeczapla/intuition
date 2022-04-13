@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.model;
+package org.magicat.intuition.model;
 
 import lombok.ToString;
 import org.springframework.data.annotation.Id;

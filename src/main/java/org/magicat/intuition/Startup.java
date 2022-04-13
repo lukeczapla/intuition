@@ -1,8 +1,8 @@
-package org.mskcc.knowledge;
+package org.magicat.intuition;
 
 import org.joda.time.DateTime;
-import org.mskcc.knowledge.config.SwaggerConfig;
-import org.mskcc.knowledge.config.WebSecurityConfig;
+import org.magicat.intuition.config.SwaggerConfig;
+import org.magicat.intuition.config.WebSecurityConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,7 +17,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableMongoRepositories
 @EnableMongoAuditing
 @EnableScheduling
-//@ComponentScan("org.mskcc.knowledge")
+//@ComponentScan("org.magicat.intuition")
 @Import({WebSecurityConfig.class, SwaggerConfig.class})
 public class Startup {
 

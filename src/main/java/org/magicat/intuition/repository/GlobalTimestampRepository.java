@@ -1,6 +1,6 @@
-package org.mskcc.knowledge.repository;
+package org.magicat.intuition.repository;
 
-import org.mskcc.knowledge.model.GlobalTimestamp;
+import org.magicat.intuition.model.GlobalTimestamp;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

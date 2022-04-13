@@ -1,6 +1,6 @@
-package org.mskcc.knowledge.MIND;
+package org.magicat.intuition.MIND;
 
-import org.mskcc.knowledge.model.Target;
+import org.magicat.intuition.model.Target;
 
 import java.util.List;
 import java.util.Set;

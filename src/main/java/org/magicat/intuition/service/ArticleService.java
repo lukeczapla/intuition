@@ -1,9 +1,9 @@
-package org.mskcc.knowledge.service;
+package org.magicat.intuition.service;
 
-import org.mskcc.knowledge.model.Article;
-import org.mskcc.knowledge.util.ProcessUtil;
-import org.mskcc.knowledge.util.Tree;
-import org.mskcc.knowledge.util.XMLParser;
+import org.magicat.intuition.model.Article;
+import org.magicat.intuition.util.ProcessUtil;
+import org.magicat.intuition.util.Tree;
+import org.magicat.intuition.util.XMLParser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 

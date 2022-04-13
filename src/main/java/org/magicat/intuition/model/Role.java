@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.model;
+package org.magicat.intuition.model;
 
 public enum Role {
     ROLE_USER,

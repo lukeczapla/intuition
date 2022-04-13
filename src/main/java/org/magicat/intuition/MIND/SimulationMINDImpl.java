@@ -1,11 +1,11 @@
-package org.mskcc.knowledge.MIND;
+package org.magicat.intuition.MIND;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.types.ObjectId;
-import org.mskcc.knowledge.model.Simulation;
-import org.mskcc.knowledge.montecarlo.MCNetwork;
-import org.mskcc.knowledge.repository.SimulationRepository;
-import org.mskcc.knowledge.util.SolrClientTool;
+import org.magicat.intuition.model.Simulation;
+import org.magicat.intuition.montecarlo.MCNetwork;
+import org.magicat.intuition.repository.SimulationRepository;
+import org.magicat.intuition.util.SolrClientTool;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.slf4j.Logger;

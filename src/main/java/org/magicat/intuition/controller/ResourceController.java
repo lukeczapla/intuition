@@ -1,10 +1,10 @@
-package org.mskcc.knowledge.controller;
+package org.magicat.intuition.controller;
 
 import org.mapdb.Atomic;
-import org.mskcc.knowledge.Startup;
-import org.mskcc.knowledge.model.ResourceModel;
-import org.mskcc.knowledge.model.User;
-import org.mskcc.knowledge.util.SystemInfo;
+import org.magicat.intuition.Startup;
+import org.magicat.intuition.model.ResourceModel;
+import org.magicat.intuition.model.User;
+import org.magicat.intuition.util.SystemInfo;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

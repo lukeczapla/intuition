@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.config;
+package org.magicat.intuition.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

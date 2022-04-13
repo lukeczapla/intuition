@@ -1,8 +1,8 @@
-package org.mskcc.knowledge.repository;
+package org.magicat.intuition.repository;
 
 import io.swagger.annotations.Api;
 import lombok.ToString;
-import org.mskcc.knowledge.model.Variant;
+import org.magicat.intuition.model.Variant;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;

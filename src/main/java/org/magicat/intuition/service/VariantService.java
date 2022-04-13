@@ -1,6 +1,6 @@
-package org.mskcc.knowledge.service;
+package org.magicat.intuition.service;
 
-import org.mskcc.knowledge.model.Variant;
+import org.magicat.intuition.model.Variant;
 
 import java.util.List;
 import java.util.Set;

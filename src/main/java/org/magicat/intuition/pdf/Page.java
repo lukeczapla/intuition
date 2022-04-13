@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.pdf;
+package org.magicat.intuition.pdf;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.mskcc.knowledge.pdf.TextRectangle.*;
+import static org.magicat.intuition.pdf.TextRectangle.*;
 
 @Getter
 @Setter

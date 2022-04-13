@@ -1,13 +1,13 @@
-package org.mskcc.knowledge.config;
+package org.magicat.intuition.config;
 
 import org.joda.time.DateTime;
-import org.mskcc.knowledge.model.GlobalTimestamp;
-import org.mskcc.knowledge.repository.ArticleRepository;
-import org.mskcc.knowledge.repository.GlobalTimestampRepository;
-import org.mskcc.knowledge.service.ArticleService;
-import org.mskcc.knowledge.service.MapService;
-import org.mskcc.knowledge.service.SolrService;
-import org.mskcc.knowledge.util.ArticleQuery;
+import org.magicat.intuition.model.GlobalTimestamp;
+import org.magicat.intuition.repository.ArticleRepository;
+import org.magicat.intuition.repository.GlobalTimestampRepository;
+import org.magicat.intuition.service.ArticleService;
+import org.magicat.intuition.service.MapService;
+import org.magicat.intuition.service.SolrService;
+import org.magicat.intuition.util.ArticleQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

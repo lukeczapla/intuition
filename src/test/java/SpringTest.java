@@ -5,15 +5,15 @@ import org.apache.solr.common.SolrDocumentList;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mskcc.knowledge.MIND.SimulationMIND;
-import org.mskcc.knowledge.model.*;
-import org.mskcc.knowledge.model.xml.UpdateConfig;
-import org.mskcc.knowledge.model.xml.UpdateItems;
-import org.mskcc.knowledge.montecarlo.MCNetwork;
-import org.mskcc.knowledge.repository.*;
-import org.mskcc.knowledge.repository.FullTextRepository;
-import org.mskcc.knowledge.service.*;
-import org.mskcc.knowledge.util.*;
+import org.magicat.intuition.MIND.SimulationMIND;
+import org.magicat.intuition.model.*;
+import org.magicat.intuition.model.xml.UpdateConfig;
+import org.magicat.intuition.model.xml.UpdateItems;
+import org.magicat.intuition.montecarlo.MCNetwork;
+import org.magicat.intuition.repository.*;
+import org.magicat.intuition.repository.FullTextRepository;
+import org.magicat.intuition.service.*;
+import org.magicat.intuition.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -35,7 +35,7 @@ import java.util.*;
 
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = org.mskcc.knowledge.Startup.class)
+@SpringBootTest(classes = org.magicat.intuition.Startup.class)
 public class SpringTest {
 
     @Autowired

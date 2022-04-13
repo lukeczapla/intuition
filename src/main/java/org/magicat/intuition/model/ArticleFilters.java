@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.model;
+package org.magicat.intuition.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
 

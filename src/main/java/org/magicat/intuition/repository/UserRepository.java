@@ -1,8 +1,8 @@
-package org.mskcc.knowledge.repository;
+package org.magicat.intuition.repository;
 
 import io.swagger.annotations.Api;
 import org.jetbrains.annotations.NotNull;
-import org.mskcc.knowledge.model.User;
+import org.magicat.intuition.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Repository;

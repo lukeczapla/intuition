@@ -1,8 +1,8 @@
-package org.mskcc.knowledge.service;
+package org.magicat.intuition.service;
 
 import io.swagger.annotations.Api;
-import org.mskcc.knowledge.model.ProjectList;
-import org.mskcc.knowledge.model.Variant;
+import org.magicat.intuition.model.ProjectList;
+import org.magicat.intuition.model.Variant;
 
 import java.util.Date;
 import java.util.List;

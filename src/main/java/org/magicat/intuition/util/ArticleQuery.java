@@ -1,19 +1,19 @@
-package org.mskcc.knowledge.util;
+package org.magicat.intuition.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.mskcc.knowledge.model.Article;
-import org.mskcc.knowledge.model.MutationMap;
-import org.mskcc.knowledge.model.Target;
-import org.mskcc.knowledge.model.TumorTypes;
-import org.mskcc.knowledge.repository.MutationMapRepository;
-import org.mskcc.knowledge.repository.TargetRepository;
+import org.magicat.intuition.model.Article;
+import org.magicat.intuition.model.MutationMap;
+import org.magicat.intuition.model.Target;
+import org.magicat.intuition.model.TumorTypes;
+import org.magicat.intuition.repository.MutationMapRepository;
+import org.magicat.intuition.repository.TargetRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import static org.mskcc.knowledge.util.SolrClientTool.escape;
+import static org.magicat.intuition.util.SolrClientTool.escape;
 
 import java.io.*;
 import java.util.*;

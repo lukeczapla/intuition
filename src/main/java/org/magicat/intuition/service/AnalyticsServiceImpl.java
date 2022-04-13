@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.service;
+package org.magicat.intuition.service;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,17 +7,17 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.joda.time.DateTime;
-import org.mskcc.knowledge.model.*;
-import org.mskcc.knowledge.repository.*;
-import org.mskcc.knowledge.util.AminoAcids;
-import org.mskcc.knowledge.util.ArticleQuery;
-import org.mskcc.knowledge.util.SolrClientTool;
+import org.magicat.intuition.model.*;
+import org.magicat.intuition.repository.*;
+import org.magicat.intuition.util.AminoAcids;
+import org.magicat.intuition.util.ArticleQuery;
+import org.magicat.intuition.util.SolrClientTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.mskcc.knowledge.util.SolrClientTool.quote;
+import static org.magicat.intuition.util.SolrClientTool.quote;
 
 import java.io.*;
 import java.net.URLEncoder;

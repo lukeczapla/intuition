@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.config;
+package org.magicat.intuition.config;
 
 //import edu.dnatools.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

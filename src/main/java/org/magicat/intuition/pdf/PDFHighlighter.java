@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.pdf;
+package org.magicat.intuition.pdf;
 import java.awt.image.RenderedImage;
 import java.io.*;
 import java.util.*;
@@ -20,10 +20,10 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationTextMarkup;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
 import org.apache.pdfbox.util.Matrix;
-import org.mskcc.knowledge.model.Article;
-import org.mskcc.knowledge.repository.ArticleRepository;
-import org.mskcc.knowledge.service.FullTextService;
-import org.mskcc.knowledge.util.SpellChecking;
+import org.magicat.intuition.model.Article;
+import org.magicat.intuition.repository.ArticleRepository;
+import org.magicat.intuition.service.FullTextService;
+import org.magicat.intuition.util.SpellChecking;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

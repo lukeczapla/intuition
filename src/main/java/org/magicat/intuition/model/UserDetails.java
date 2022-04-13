@@ -1,5 +1,5 @@
 
-package org.mskcc.knowledge.model;
+package org.magicat.intuition.model;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.util;
+package org.magicat.intuition.util;
 
 import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
@@ -35,8 +35,8 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.apache.solr.common.util.NamedList;
-import org.mskcc.knowledge.config.ConfigProperties;
-import org.mskcc.knowledge.model.SolrItem;
+import org.magicat.intuition.config.ConfigProperties;
+import org.magicat.intuition.model.SolrItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;

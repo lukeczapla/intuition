@@ -1,6 +1,6 @@
-package org.mskcc.knowledge.repository;
+package org.magicat.intuition.repository;
 
-import org.mskcc.knowledge.model.Resource;
+import org.magicat.intuition.model.Resource;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

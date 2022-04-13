@@ -1,7 +1,7 @@
-package org.mskcc.knowledge.controller;
+package org.magicat.intuition.controller;
 
-import org.mskcc.knowledge.model.Article;
-import org.mskcc.knowledge.repository.ArticleRepository;
+import org.magicat.intuition.model.Article;
+import org.magicat.intuition.repository.ArticleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

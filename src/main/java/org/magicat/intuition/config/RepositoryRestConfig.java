@@ -1,9 +1,9 @@
-package org.mskcc.knowledge.config;
+package org.magicat.intuition.config;
 
-import org.mskcc.knowledge.model.CancerMap;
-import org.mskcc.knowledge.model.DrugMap;
-import org.mskcc.knowledge.model.GeneMap;
-import org.mskcc.knowledge.model.MutationMap;
+import org.magicat.intuition.model.CancerMap;
+import org.magicat.intuition.model.DrugMap;
+import org.magicat.intuition.model.GeneMap;
+import org.magicat.intuition.model.MutationMap;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;

@@ -1,6 +1,6 @@
-package org.mskcc.knowledge.service;
+package org.magicat.intuition.service;
 
-import org.mskcc.knowledge.model.User;
+import org.magicat.intuition.model.User;
 
 import java.util.Map;
 

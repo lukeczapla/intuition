@@ -1,14 +1,14 @@
-package org.mskcc.knowledge.controller;
+package org.magicat.intuition.controller;
 
 import io.swagger.annotations.Api;
-import org.mskcc.knowledge.model.Article;
-import org.mskcc.knowledge.pdf.Document;
-import org.mskcc.knowledge.pdf.PDFHighlighter;
-import org.mskcc.knowledge.pdf.Section;
-import org.mskcc.knowledge.repository.ArticleRepository;
-import org.mskcc.knowledge.repository.FullTextRepository;
-import org.mskcc.knowledge.service.FullTextService;
-import org.mskcc.knowledge.util.SpellChecking;
+import org.magicat.intuition.model.Article;
+import org.magicat.intuition.pdf.Document;
+import org.magicat.intuition.pdf.PDFHighlighter;
+import org.magicat.intuition.pdf.Section;
+import org.magicat.intuition.repository.ArticleRepository;
+import org.magicat.intuition.repository.FullTextRepository;
+import org.magicat.intuition.service.FullTextService;
+import org.magicat.intuition.util.SpellChecking;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.security.access.annotation.Secured;

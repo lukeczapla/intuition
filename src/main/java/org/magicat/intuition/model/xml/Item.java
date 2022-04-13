@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.model.xml;
+package org.magicat.intuition.model.xml;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.model;
+package org.magicat.intuition.model;
 
 import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;

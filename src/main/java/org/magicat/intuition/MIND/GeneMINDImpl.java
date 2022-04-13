@@ -1,11 +1,11 @@
-package org.mskcc.knowledge.MIND;
+package org.magicat.intuition.MIND;
 
-import org.mskcc.knowledge.model.Target;
-import org.mskcc.knowledge.model.Variant;
-import org.mskcc.knowledge.repository.TargetRepository;
-import org.mskcc.knowledge.repository.VariantRepository;
-import org.mskcc.knowledge.service.SolrService;
-import org.mskcc.knowledge.service.TextService;
+import org.magicat.intuition.model.Target;
+import org.magicat.intuition.model.Variant;
+import org.magicat.intuition.repository.TargetRepository;
+import org.magicat.intuition.repository.VariantRepository;
+import org.magicat.intuition.service.SolrService;
+import org.magicat.intuition.service.TextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

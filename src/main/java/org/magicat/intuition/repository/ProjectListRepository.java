@@ -1,7 +1,7 @@
-package org.mskcc.knowledge.repository;
+package org.magicat.intuition.repository;
 
 import org.jetbrains.annotations.NotNull;
-import org.mskcc.knowledge.model.ProjectList;
+import org.magicat.intuition.model.ProjectList;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;

@@ -1,10 +1,10 @@
-package org.mskcc.knowledge.repository;
+package org.magicat.intuition.repository;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
-import org.mskcc.knowledge.model.Article;
+import org.magicat.intuition.model.Article;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;

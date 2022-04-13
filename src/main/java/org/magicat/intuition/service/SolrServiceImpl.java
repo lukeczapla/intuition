@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.service;
+package org.magicat.intuition.service;
 
 import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
@@ -7,12 +7,12 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.mskcc.knowledge.model.Article;
-import org.mskcc.knowledge.model.FullText;
-import org.mskcc.knowledge.model.xml.UpdateConfig;
-import org.mskcc.knowledge.repository.ArticleRepository;
-import org.mskcc.knowledge.repository.FullTextRepository;
-import org.mskcc.knowledge.util.SolrClientTool;
+import org.magicat.intuition.model.Article;
+import org.magicat.intuition.model.FullText;
+import org.magicat.intuition.model.xml.UpdateConfig;
+import org.magicat.intuition.repository.ArticleRepository;
+import org.magicat.intuition.repository.FullTextRepository;
+import org.magicat.intuition.util.SolrClientTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import static org.mskcc.knowledge.util.SolrClientTool.escape;
+import static org.magicat.intuition.util.SolrClientTool.escape;
 
 import java.io.File;
 import java.io.IOException;

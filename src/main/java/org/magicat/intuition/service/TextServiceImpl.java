@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.service;
+package org.magicat.intuition.service;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
 import lombok.AllArgsConstructor;
@@ -10,13 +10,13 @@ import opennlp.tools.sentdetect.SentenceModel;
 import opennlp.tools.util.Span;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.mskcc.knowledge.model.*;
-import org.mskcc.knowledge.repository.ArticleRepository;
-import org.mskcc.knowledge.repository.FullTextRepository;
-import org.mskcc.knowledge.repository.GeneMapRepository;
-import org.mskcc.knowledge.util.AminoAcids;
-import org.mskcc.knowledge.util.SolrClientTool;
-import org.mskcc.knowledge.util.TikaTool;
+import org.magicat.intuition.model.*;
+import org.magicat.intuition.repository.ArticleRepository;
+import org.magicat.intuition.repository.FullTextRepository;
+import org.magicat.intuition.repository.GeneMapRepository;
+import org.magicat.intuition.util.AminoAcids;
+import org.magicat.intuition.util.SolrClientTool;
+import org.magicat.intuition.util.TikaTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
-package org.mskcc.knowledge.repository;
+package org.magicat.intuition.repository;
 
-import org.mskcc.knowledge.model.Simulation;
-import org.mskcc.knowledge.montecarlo.MCNetwork;
+import org.magicat.intuition.model.Simulation;
+import org.magicat.intuition.montecarlo.MCNetwork;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.security.access.annotation.Secured;

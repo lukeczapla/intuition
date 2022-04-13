@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.montecarlo;
+package org.magicat.intuition.montecarlo;
 
 import lombok.EqualsAndHashCode;
 import org.datavec.api.records.reader.RecordReader;

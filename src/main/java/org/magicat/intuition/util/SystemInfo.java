@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.util;
+package org.magicat.intuition.util;
 import java.io.File;
 import java.text.NumberFormat;
 

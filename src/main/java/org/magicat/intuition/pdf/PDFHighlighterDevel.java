@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.pdf;
+package org.magicat.intuition.pdf;
 
 import java.io.*;
 import java.util.ArrayList;

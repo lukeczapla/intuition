@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.service;
+package org.magicat.intuition.service;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -11,12 +11,12 @@ import org.apache.solr.common.SolrDocumentList;
 import org.bson.types.Binary;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTimeZone;
-import org.mskcc.knowledge.model.Article;
-import org.mskcc.knowledge.model.FullText;
-import org.mskcc.knowledge.repository.ArticleRepository;
-import org.mskcc.knowledge.repository.FullTextRepository;
-import org.mskcc.knowledge.util.SolrClientTool;
-import org.mskcc.knowledge.util.TikaTool;
+import org.magicat.intuition.model.Article;
+import org.magicat.intuition.model.FullText;
+import org.magicat.intuition.repository.ArticleRepository;
+import org.magicat.intuition.repository.FullTextRepository;
+import org.magicat.intuition.util.SolrClientTool;
+import org.magicat.intuition.util.TikaTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +36,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class FullTextServiceImpl implements org.mskcc.knowledge.service.FullTextService {
+public class FullTextServiceImpl implements org.magicat.intuition.service.FullTextService {
 
-    public static final Logger log = LoggerFactory.getLogger(org.mskcc.knowledge.service.FullTextService.class);
+    public static final Logger log = LoggerFactory.getLogger(org.magicat.intuition.service.FullTextService.class);
 
     private final ArticleService articleService;
     private final GridFsTemplate gridFsTemplate;

@@ -1,12 +1,12 @@
-package org.mskcc.knowledge.util;
+package org.magicat.intuition.util;
 
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoWriteException;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.mskcc.knowledge.model.Article;
-import org.mskcc.knowledge.repository.ArticleRepository;
+import org.magicat.intuition.model.Article;
+import org.magicat.intuition.repository.ArticleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

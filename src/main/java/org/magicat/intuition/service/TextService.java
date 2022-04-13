@@ -1,6 +1,6 @@
-package org.mskcc.knowledge.service;
+package org.magicat.intuition.service;
 
-import org.mskcc.knowledge.model.ProjectList;
+import org.magicat.intuition.model.ProjectList;
 
 import java.util.List;
 import java.util.Map;

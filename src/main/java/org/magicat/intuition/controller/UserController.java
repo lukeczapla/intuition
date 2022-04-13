@@ -1,11 +1,11 @@
-package org.mskcc.knowledge.controller;
+package org.magicat.intuition.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.bson.types.Binary;
-import org.mskcc.knowledge.model.User;
-import org.mskcc.knowledge.repository.UserRepository;
-import org.mskcc.knowledge.service.UserDetailsService;
+import org.magicat.intuition.model.User;
+import org.magicat.intuition.repository.UserRepository;
+import org.magicat.intuition.service.UserDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

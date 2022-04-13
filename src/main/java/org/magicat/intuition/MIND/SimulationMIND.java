@@ -1,7 +1,7 @@
-package org.mskcc.knowledge.MIND;
+package org.magicat.intuition.MIND;
 
-import org.mskcc.knowledge.model.Simulation;
-import org.mskcc.knowledge.montecarlo.MCNetwork;
+import org.magicat.intuition.model.Simulation;
+import org.magicat.intuition.montecarlo.MCNetwork;
 
 public interface SimulationMIND {
     /**

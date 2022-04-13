@@ -1,15 +1,15 @@
-package org.mskcc.knowledge.tests;
+package org.magicat.intuition.tests;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mskcc.knowledge.MIND.GeneMIND;
-import org.mskcc.knowledge.MIND.StructureMIND;
-import org.mskcc.knowledge.model.Target;
-import org.mskcc.knowledge.repository.TargetRepository;
-import org.mskcc.knowledge.util.SolrClientTool;
+import org.magicat.intuition.MIND.GeneMIND;
+import org.magicat.intuition.MIND.StructureMIND;
+import org.magicat.intuition.model.Target;
+import org.magicat.intuition.repository.TargetRepository;
+import org.magicat.intuition.util.SolrClientTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;

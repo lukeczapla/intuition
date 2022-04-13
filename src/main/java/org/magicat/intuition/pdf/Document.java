@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.pdf;
+package org.magicat.intuition.pdf;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
 import lombok.EqualsAndHashCode;
@@ -9,11 +9,11 @@ import org.apache.pdfbox.text.TextPosition;
 //import org.apache.solr.common.util.Pair;
 import org.bson.types.Binary;
 import org.bson.types.ObjectId;
-import org.mskcc.knowledge.model.Article;
-import org.mskcc.knowledge.model.FullText;
-import org.mskcc.knowledge.repository.FullTextRepository;
-import org.mskcc.knowledge.util.SolrClientTool;
-import org.mskcc.knowledge.util.SpellChecking;
+import org.magicat.intuition.model.Article;
+import org.magicat.intuition.model.FullText;
+import org.magicat.intuition.repository.FullTextRepository;
+import org.magicat.intuition.util.SolrClientTool;
+import org.magicat.intuition.util.SpellChecking;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;

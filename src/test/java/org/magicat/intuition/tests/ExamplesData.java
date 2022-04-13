@@ -9,7 +9,7 @@
  * in the root folder of the repository checkout or at:
  * https://www.carrot2.org/carrot2.LICENSE
  */
-package org.mskcc.knowledge.tests;
+package org.magicat.intuition.tests;
 
 import java.util.Arrays;
 import java.util.stream.Stream;

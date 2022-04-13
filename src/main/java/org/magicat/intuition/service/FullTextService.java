@@ -1,7 +1,7 @@
-package org.mskcc.knowledge.service;
+package org.magicat.intuition.service;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.mskcc.knowledge.model.Article;
+import org.magicat.intuition.model.Article;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;

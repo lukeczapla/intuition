@@ -1,10 +1,10 @@
-package org.mskcc.knowledge.controller;
+package org.magicat.intuition.controller;
 
 import io.swagger.annotations.Api;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
-import org.mskcc.knowledge.model.SimulationParameters;
-import org.mskcc.knowledge.montecarlo.MCNetwork;
+import org.magicat.intuition.model.SimulationParameters;
+import org.magicat.intuition.montecarlo.MCNetwork;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestBody;

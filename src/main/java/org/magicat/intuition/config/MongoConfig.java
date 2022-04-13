@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.config;
+package org.magicat.intuition.config;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;

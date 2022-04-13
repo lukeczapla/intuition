@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.pdf;
+package org.magicat.intuition.pdf;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;

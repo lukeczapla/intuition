@@ -1,8 +1,8 @@
-package org.mskcc.knowledge.repository;
+package org.magicat.intuition.repository;
 
 import io.swagger.annotations.Api;
-import org.mskcc.knowledge.model.Antibody;
-import org.mskcc.knowledge.util.AminoAcids;
+import org.magicat.intuition.model.Antibody;
+import org.magicat.intuition.util.AminoAcids;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;

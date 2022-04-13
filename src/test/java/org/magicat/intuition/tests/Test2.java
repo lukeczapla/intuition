@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.tests;
+package org.magicat.intuition.tests;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -31,12 +31,12 @@ import org.carrot2.language.LanguageComponents;
 import org.carrot2.math.matrix.FactorizationQuality;
 import org.carrot2.math.matrix.LocalNonnegativeMatrixFactorizationFactory;
 import org.junit.jupiter.api.Test;
-import org.mskcc.knowledge.model.Article;
-import org.mskcc.knowledge.model.xml.Item;
-import org.mskcc.knowledge.model.xml.UpdateConfig;
-import org.mskcc.knowledge.model.xml.UpdateItems;
-import org.mskcc.knowledge.service.TextServiceImpl;
-import org.mskcc.knowledge.util.*;
+import org.magicat.intuition.model.Article;
+import org.magicat.intuition.model.xml.Item;
+import org.magicat.intuition.model.xml.UpdateConfig;
+import org.magicat.intuition.model.xml.UpdateItems;
+import org.magicat.intuition.service.TextServiceImpl;
+import org.magicat.intuition.util.*;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

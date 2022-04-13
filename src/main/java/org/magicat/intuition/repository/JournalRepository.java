@@ -1,8 +1,8 @@
-package org.mskcc.knowledge.repository;
+package org.magicat.intuition.repository;
 
 import io.swagger.annotations.Api;
-import org.mskcc.knowledge.model.CancerMap;
-import org.mskcc.knowledge.model.Journal;
+import org.magicat.intuition.model.CancerMap;
+import org.magicat.intuition.model.Journal;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.security.access.annotation.Secured;

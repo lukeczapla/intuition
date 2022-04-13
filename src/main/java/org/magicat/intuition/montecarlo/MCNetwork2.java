@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.montecarlo;
+package org.magicat.intuition.montecarlo;
 
 import org.datavec.api.records.reader.RecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;

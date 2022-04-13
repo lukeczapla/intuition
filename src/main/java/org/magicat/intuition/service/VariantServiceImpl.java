@@ -1,15 +1,15 @@
-package org.mskcc.knowledge.service;
+package org.magicat.intuition.service;
 
 import lombok.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.solr.common.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
-import org.mskcc.knowledge.model.Article;
-import org.mskcc.knowledge.model.Variant;
-import org.mskcc.knowledge.repository.ArticleRepository;
-import org.mskcc.knowledge.repository.FullTextRepository;
-import org.mskcc.knowledge.repository.VariantRepository;
+import org.magicat.intuition.model.Article;
+import org.magicat.intuition.model.Variant;
+import org.magicat.intuition.repository.ArticleRepository;
+import org.magicat.intuition.repository.FullTextRepository;
+import org.magicat.intuition.repository.VariantRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class VariantServiceImpl implements VariantService {
 
     private final static Logger log = LoggerFactory.getLogger(VariantService.class);
 
-    private final org.mskcc.knowledge.service.FullTextService fullTextService;
+    private final org.magicat.intuition.service.FullTextService fullTextService;
     private final SolrService solrService;
     private final FullTextRepository fullTextRepository;
     private final VariantRepository variantRepository;
@@ -32,7 +32,7 @@ public class VariantServiceImpl implements VariantService {
     private final ArticleRepository articleRepository;
 
     @Autowired
-    public VariantServiceImpl(org.mskcc.knowledge.service.FullTextService fullTextService, SolrService solrService, FullTextRepository fullTextRepository, VariantRepository variantRepository,
+    public VariantServiceImpl(org.magicat.intuition.service.FullTextService fullTextService, SolrService solrService, FullTextRepository fullTextRepository, VariantRepository variantRepository,
                               ArticleService articleService, ArticleRepository articleRepository) {
         this.fullTextService = fullTextService;
         this.solrService = solrService;

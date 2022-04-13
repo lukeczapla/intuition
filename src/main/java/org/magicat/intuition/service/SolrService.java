@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.service;
+package org.magicat.intuition.service;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Setter;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.joda.time.DateTime;
-import org.mskcc.knowledge.util.SolrClientTool;
+import org.magicat.intuition.util.SolrClientTool;
 
 import java.util.List;
 

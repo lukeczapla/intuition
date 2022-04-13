@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.tests;
+package org.magicat.intuition.tests;
 
 import au.com.bytecode.opencsv.CSVReader;
 import com.google.common.collect.Lists;
@@ -37,20 +37,20 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mskcc.knowledge.MIND.SimulationMIND;
-import org.mskcc.knowledge.config.MongoConfig;
-import org.mskcc.knowledge.controller.ArticleController;
-import org.mskcc.knowledge.controller.VariantController;
-import org.mskcc.knowledge.model.*;
-import org.mskcc.knowledge.model.xml.UpdateConfig;
-import org.mskcc.knowledge.model.xml.UpdateItems;
-import org.mskcc.knowledge.montecarlo.MCNetwork;
-import org.mskcc.knowledge.pdf.PDFHighlighter;
-import org.mskcc.knowledge.pdf.Section;
-import org.mskcc.knowledge.repository.*;
-import org.mskcc.knowledge.repository.FullTextRepository;
-import org.mskcc.knowledge.service.*;
-import org.mskcc.knowledge.util.*;
+import org.magicat.intuition.MIND.SimulationMIND;
+import org.magicat.intuition.config.MongoConfig;
+import org.magicat.intuition.controller.ArticleController;
+import org.magicat.intuition.controller.VariantController;
+import org.magicat.intuition.model.*;
+import org.magicat.intuition.model.xml.UpdateConfig;
+import org.magicat.intuition.model.xml.UpdateItems;
+import org.magicat.intuition.montecarlo.MCNetwork;
+import org.magicat.intuition.pdf.PDFHighlighter;
+import org.magicat.intuition.pdf.Section;
+import org.magicat.intuition.repository.*;
+import org.magicat.intuition.repository.FullTextRepository;
+import org.magicat.intuition.service.*;
+import org.magicat.intuition.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,7 +121,7 @@ public class Test1 {
     @Autowired
     CancerTypeRepository cancerTypeRepository;
     @Autowired
-    org.mskcc.knowledge.service.FullTextService fullTextService;
+    org.magicat.intuition.service.FullTextService fullTextService;
     @Autowired
     FullTextRepository fullTextRepository;
     @Autowired
@@ -1070,7 +1070,7 @@ public class Test1 {
 
     @Test
     public void testRestore() {
-        org.mskcc.knowledge.pdf.Document document = org.mskcc.knowledge.pdf.Document.readDocument(articleRepository.findByPmId("19376813"), fullTextRepository, gridFsTemplate);
+        org.magicat.intuition.pdf.Document document = org.magicat.intuition.pdf.Document.readDocument(articleRepository.findByPmId("19376813"), fullTextRepository, gridFsTemplate);
         List<Section> sections = document.getSections();
         for (Section section: sections) {
             if (section.getImage() != null) section.getImage().restoreImage();
@@ -1096,7 +1096,7 @@ public class Test1 {
                 PDFHighlighter hl = new PDFHighlighter(); //28947956
                 hl.setFullTextService(fullTextService);
                 hl.analyze(articleRepository.findByPmId(ft.getPmId()), spellChecking);
-                org.mskcc.knowledge.pdf.Document document = hl.getDocument();
+                org.magicat.intuition.pdf.Document document = hl.getDocument();
                 document.stripArticleData();
                 document.annotate();
                 document.writeDocument(fullTextRepository, gridFsTemplate);
@@ -1118,7 +1118,7 @@ public class Test1 {
             long startTime = System.nanoTime();
             hl.setFullTextService(fullTextService);
             hl.analyze(articleRepository.findByPmId("34301786"), spellChecking);
-            org.mskcc.knowledge.pdf.Document document = hl.getDocument();
+            org.magicat.intuition.pdf.Document document = hl.getDocument();
             document.stripArticleData();
             document.annotate();
             long endTime = System.nanoTime();

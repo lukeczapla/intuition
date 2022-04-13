@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.tests;
+package org.magicat.intuition.tests;
 
 import java.util.List;
 import org.carrot2.clustering.Cluster;

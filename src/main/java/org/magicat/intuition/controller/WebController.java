@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.controller;
+package org.magicat.intuition.controller;
 
 import io.swagger.annotations.Api;
 import org.springframework.stereotype.Controller;

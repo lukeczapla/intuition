@@ -1,10 +1,10 @@
-package org.mskcc.knowledge.MIND;
+package org.magicat.intuition.MIND;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.mskcc.knowledge.service.SolrService;
-import org.mskcc.knowledge.util.SolrClientTool;
+import org.magicat.intuition.service.SolrService;
+import org.magicat.intuition.util.SolrClientTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

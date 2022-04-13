@@ -1,9 +1,9 @@
-package org.mskcc.knowledge.service;
+package org.magicat.intuition.service;
 
-import org.mskcc.knowledge.model.Role;
-import org.mskcc.knowledge.model.User;
-import org.mskcc.knowledge.model.UserDetails;
-import org.mskcc.knowledge.repository.UserRepository;
+import org.magicat.intuition.model.Role;
+import org.magicat.intuition.model.User;
+import org.magicat.intuition.model.UserDetails;
+import org.magicat.intuition.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

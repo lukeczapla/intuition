@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.util;
+package org.magicat.intuition.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.carrot2.clustering.Cluster;
@@ -8,7 +8,7 @@ import org.carrot2.clustering.stc.STCClusteringAlgorithm;
 import org.carrot2.language.LanguageComponents;
 import org.carrot2.math.matrix.FactorizationQuality;
 import org.carrot2.math.matrix.LocalNonnegativeMatrixFactorizationFactory;
-import org.mskcc.knowledge.model.Article;
+import org.magicat.intuition.model.Article;
 
 import java.io.IOException;
 import java.util.*;

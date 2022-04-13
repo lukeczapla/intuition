@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.config;
+package org.magicat.intuition.config;
 
 // very simple way to switch systems quickly;
 public class ConfigProperties {

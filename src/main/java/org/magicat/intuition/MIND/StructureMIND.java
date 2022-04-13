@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.MIND;
+package org.magicat.intuition.MIND;
 
 import java.util.Arrays;
 import java.util.List;

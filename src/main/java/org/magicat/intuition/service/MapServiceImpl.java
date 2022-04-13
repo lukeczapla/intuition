@@ -1,15 +1,15 @@
-package org.mskcc.knowledge.service;
+package org.magicat.intuition.service;
 
 import com.google.common.collect.Lists;
 import org.apache.solr.common.util.Pair;
 import org.joda.time.DateTime;
-import org.mskcc.knowledge.model.*;
-import org.mskcc.knowledge.model.xml.Item;
-import org.mskcc.knowledge.model.xml.UpdateConfig;
-import org.mskcc.knowledge.model.xml.UpdateItems;
-import org.mskcc.knowledge.repository.*;
-import org.mskcc.knowledge.util.AminoAcids;
-import org.mskcc.knowledge.util.ArticleQuery;
+import org.magicat.intuition.model.*;
+import org.magicat.intuition.model.xml.Item;
+import org.magicat.intuition.model.xml.UpdateConfig;
+import org.magicat.intuition.model.xml.UpdateItems;
+import org.magicat.intuition.repository.*;
+import org.magicat.intuition.util.AminoAcids;
+import org.magicat.intuition.util.ArticleQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

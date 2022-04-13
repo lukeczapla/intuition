@@ -1,7 +1,7 @@
-package org.mskcc.knowledge.service;
+package org.magicat.intuition.service;
 
-import org.mskcc.knowledge.model.xml.UpdateConfig;
-import org.mskcc.knowledge.model.xml.UpdateItems;
+import org.magicat.intuition.model.xml.UpdateConfig;
+import org.magicat.intuition.model.xml.UpdateItems;
 
 import java.util.List;
 

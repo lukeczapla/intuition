@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.util;
+package org.magicat.intuition.util;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

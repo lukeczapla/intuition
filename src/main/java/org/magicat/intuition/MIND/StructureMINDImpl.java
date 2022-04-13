@@ -1,7 +1,7 @@
-package org.mskcc.knowledge.MIND;
+package org.magicat.intuition.MIND;
 
 import org.biojava.nbio.structure.*;
-import org.mskcc.knowledge.util.AminoAcids;
+import org.magicat.intuition.util.AminoAcids;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

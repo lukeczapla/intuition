@@ -1,8 +1,8 @@
-package org.mskcc.knowledge.repository;
+package org.magicat.intuition.repository;
 
 import io.swagger.annotations.Api;
 import org.jetbrains.annotations.NotNull;
-import org.mskcc.knowledge.model.CancerType;
+import org.magicat.intuition.model.CancerType;
 import org.springframework.context.annotation.Role;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;

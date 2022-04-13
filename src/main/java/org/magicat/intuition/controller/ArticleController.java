@@ -1,4 +1,4 @@
-package org.mskcc.knowledge.controller;
+package org.magicat.intuition.controller;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -10,14 +10,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
-import org.mskcc.knowledge.model.*;
-import org.mskcc.knowledge.repository.*;
-import org.mskcc.knowledge.repository.FullTextRepository;
-import org.mskcc.knowledge.service.*;
-import org.mskcc.knowledge.util.AminoAcids;
-import org.mskcc.knowledge.pdf.PDFHighlighter;
-import org.mskcc.knowledge.util.SolrClientTool;
-import org.mskcc.knowledge.util.TikaTool;
+import org.magicat.intuition.model.*;
+import org.magicat.intuition.repository.*;
+import org.magicat.intuition.repository.FullTextRepository;
+import org.magicat.intuition.service.*;
+import org.magicat.intuition.util.AminoAcids;
+import org.magicat.intuition.pdf.PDFHighlighter;
+import org.magicat.intuition.util.SolrClientTool;
+import org.magicat.intuition.util.TikaTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +54,7 @@ public class ArticleController {
 
     private final ArticleService articleService;
     private final ArticleRepository articleRepository;
-    private final org.mskcc.knowledge.service.FullTextService fullTextService;
+    private final org.magicat.intuition.service.FullTextService fullTextService;
     private final FullTextRepository fullTextRepository;
     private final TargetRepository targetRepository;
     private final GridFsTemplate gridFsTemplate;
@@ -71,7 +71,7 @@ public class ArticleController {
     private String threadStop = "";
 
     @Autowired
-    public ArticleController(TargetRepository targetRepository, ArticleRepository articleRepository, ArticleService articleService, org.mskcc.knowledge.service.FullTextService fullTextService, TextService textService,
+    public ArticleController(TargetRepository targetRepository, ArticleRepository articleRepository, ArticleService articleService, org.magicat.intuition.service.FullTextService fullTextService, TextService textService,
                              AnalyticsService analyticsService, SolrService solrService, UserRepository userRepository, /*GeneMapRepository geneMapRepository, CancerMapRepository cancerMapRepository,
                              MutationMapRepository mutationMapRepository, DrugMapRepository drugMapRepository,*/ FullTextRepository fullTextRepository, GridFsTemplate gridFsTemplate, ProjectListRepository projectListRepository) {
         this.articleService = articleService;
