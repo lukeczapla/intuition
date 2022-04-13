@@ -1,0 +1,4 @@
+#/bin/bash
+
+mvn -e -Dtest=SpringTest#processSpreadsheet -DoutputFileName=ATKmutants-out.xlsx -Dfilename=AKT1-2-3-VUS.xlsx test
+

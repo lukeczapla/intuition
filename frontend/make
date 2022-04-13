@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cp src/endpoint_deploy.js src/endpoint.js
+npm run-script build
+cp -R build/* ../src/main/webapp
+cp src/endpoint_test.js src/endpoint.js
+npm start
+
+
