@@ -1,8 +1,12 @@
-import requests
+import os
+import sys
 import xml.etree.ElementTree as ET
-import sys, os
-from utils import grouper
 from math import ceil
+
+import requests
+
+from utils import grouper
+
 
 def ask(query):
     pub_ids = get_pub_ids(query)
@@ -27,10 +31,12 @@ def get_pub_ids(query):
 
     return [f.text for f in ET.fromstring(res.content).find('IdList')]
 
+
 def tree(root):
     for child in root:
       tree(child)
       print(child.tag, child.attrib, child.text)
+
 
 def get_pub_content(ids, done=False):
     res = requests.get(

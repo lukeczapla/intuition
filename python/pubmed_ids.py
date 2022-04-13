@@ -1,8 +1,7 @@
+import os
+import sys
+
 import requests
-import xml.etree.ElementTree as ET
-import sys, os
-from utils import grouper
-from math import ceil
 
 
 def get_pub_content(ids, done=False):

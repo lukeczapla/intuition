@@ -1,8 +1,12 @@
-import requests
+import os
+import sys
 import xml.etree.ElementTree as ET
-import sys, os
-from utils import grouper
 from math import ceil
+
+import requests
+
+from utils import grouper
+
 
 def ask(query):
     pub_ids = get_pub_ids(query)
@@ -27,10 +31,11 @@ def get_pub_ids(query):
 
     return [f.text for f in ET.fromstring(res.content).find('IdList')]
 
+
 def tree(root):
     for child in root:
-      tree(child)
-      print(child.tag, child.attrib, child.text)
+        tree(child)
+        print(child.tag, child.attrib, child.text)
 
 def get_pub_content(ids, done=False):
     res = requests.get(
@@ -51,6 +56,7 @@ def get_pub_content(ids, done=False):
         else:
             os.system("ghead -n -1 myfile.xml > pubmed_list.xml")
 
+
 def get_str_id_content(idstr):
     res = requests.get(
         url=f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id={idstr}&rettype=text"
@@ -59,6 +65,7 @@ def get_str_id_content(idstr):
     file1 = open("pubmed_list.xml", "wb")
     file1.write(res.content)
     file1.close()
+
 
 if __name__ == '__main__':
     if os.path.exists("pubmed_list.xml"):

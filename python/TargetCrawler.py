@@ -1,5 +1,6 @@
 import scrapy
 
+
 def build_base():
     return {"gene": "", "targetSymbol": ""}
 
@@ -7,11 +8,13 @@ def build_base():
 class AbSpider(scrapy.Spider):
     name = 'NCBIspider'
     allowed_domains = ['https://www.ncbi.nlm.nih.gov']
+
     def __init__(self, url='https://www.ncbi.nlm.nih.gov', gene='A1BG', **kwargs):
         self.start_urls = [url]
         self.gene = gene
         #self.download_delay = 0.05
         super().__init__(**kwargs)
+
     def parse(self, response):
         result = response.xpath('//span[@class = "gn"]/text()').getall()
         if result:
