@@ -20,7 +20,7 @@
     "react-html-attributes": "^1.4.6",
     "react-icons": "^4.2.0",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "4.0.3",
+    "react-scripts": "^5.0.1",
     "react-select": "^4.3.1",
     "sass": "^1.38.0",
     "smiles-drawer": "^1.2.0",
