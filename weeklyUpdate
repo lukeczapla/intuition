@@ -1,4 +1,4 @@
 #!/bin/bash
 
-mvn -Dtest=SpringTest#runWeeklyUpdate test
+mvn -Dtest=SpringTest#pullDaily test
 
