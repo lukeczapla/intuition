@@ -25,7 +25,7 @@ knowledge folder) - or use bash script processSpreadsheet:
 
 ```bash
 
-mvn -Dtest=SpringTest#processSpreadsheet test
+mvn -Dtest=SpringTest#processSpreadsheet -Dfilename=oncokb_braf_tp53_ros1_pmids.xlsx test
 
 ```
 
@@ -35,7 +35,7 @@ two days now):
 
 ```bash
 
-mvn -Dtest=SpringTest#runWeeklyUpdate test
+mvn -Dtest=SpringTest#pullDaily test
 
 ```
 
