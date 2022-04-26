@@ -5,15 +5,16 @@ import org.apache.solr.common.SolrDocumentList;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.magicat.intuition.MIND.SimulationMIND;
-import org.magicat.intuition.model.*;
-import org.magicat.intuition.model.xml.UpdateConfig;
-import org.magicat.intuition.model.xml.UpdateItems;
-import org.magicat.intuition.montecarlo.MCNetwork;
-import org.magicat.intuition.repository.*;
-import org.magicat.intuition.repository.FullTextRepository;
-import org.magicat.intuition.service.*;
-import org.magicat.intuition.util.*;
+import org.magicat.MIND.SimulationMIND;
+import org.magicat.model.Article;
+import org.magicat.model.FullText;
+import org.magicat.model.GlobalTimestamp;
+import org.magicat.model.xml.UpdateConfig;
+import org.magicat.model.xml.UpdateItems;
+import org.magicat.montecarlo.MCNetwork;
+import org.magicat.repository.*;
+import org.magicat.service.*;
+import org.magicat.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -31,11 +32,13 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = org.magicat.intuition.Startup.class)
+@SpringBootTest(classes = org.magicat.Startup.class)
 public class SpringTest {
 
     @Autowired
