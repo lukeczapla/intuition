@@ -202,7 +202,12 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             //List<String> geneSynonyms = ot.map(target -> Arrays.asList(escape(target.getSynonyms()).split(";"))).orElse(null);
             List<Target> targetList = targetRepository.findAllBySymbol(gene);  // treat multiple hits
             List<String> geneSynonyms = null;
-            if (targetList != null && targetList.size() > 0) geneSynonyms = Arrays.asList(targetList.get(0).getSynonyms().split(";"));
+            if (targetList != null && targetList.size() > 0) {
+                for (Target t : targetList) {
+                    if (geneSynonyms == null) geneSynonyms = Arrays.asList(t.getSynonyms().split(";"));
+                    else geneSynonyms.addAll(Arrays.asList(t.getSynonyms().split(";")));
+                }
+            }
             List<String> mutationSynonyms = (mutation != null && !AminoAcids.mutationSynonym(mutation).equalsIgnoreCase(mutation) ? new ArrayList<>() : null);
             if (mutationSynonyms != null) mutationSynonyms.add(AminoAcids.mutationSynonym(mutation));
             List<String> drugs = null;

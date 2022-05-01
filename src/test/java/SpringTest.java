@@ -114,8 +114,21 @@ public class SpringTest {
     }
 
     @Test
-    void runWeeklyUpdate() {
+    void runFullUpdate() {
+        articleService.setRelevance(true);
+        int pageNumber = (int)(articleRepository.count() / 50000);
         articleService.updateArticlesPubmed();
+        articleService.updateCitations(pageNumber, 50000);
+        articleService.addCitationRecords(pageNumber, 50000);
+        solrService.updateSolrArticles(pageNumber, 50000);
+    }
+
+    @Test
+    void followupCitations() {
+        int pageNumber = 222;
+        articleService.updateCitations(pageNumber, 50000);
+        articleService.addCitationRecords(pageNumber, 50000);
+        solrService.updateSolrArticles(pageNumber, 50000);
     }
 
 

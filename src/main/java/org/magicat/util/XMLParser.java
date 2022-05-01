@@ -64,7 +64,8 @@ public class XMLParser {
             root = document.getDocumentElement();
             log.info("Read XML with head node {}", root.getNodeName());
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            log.error("Error occurred in reload");
             log.error(e.getMessage());
         }
     }

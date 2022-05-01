@@ -1,0 +1,4 @@
+#!/bin/bash
+export MAVEN_OPTS="-Xms12g -Xmx16g"
+mvn -Dtest=SpringTest#runFullUpdate test
+

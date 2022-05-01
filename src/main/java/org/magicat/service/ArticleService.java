@@ -35,4 +35,6 @@ public interface ArticleService {
 
     //void runSearchCompleteParallel(String XMLFile);
 
+    void setRelevance(boolean relevance);
+
 }

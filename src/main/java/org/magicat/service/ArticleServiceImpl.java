@@ -45,6 +45,7 @@ public class ArticleServiceImpl implements ArticleService {
     private final CancerTypeRepository cancerTypeRepository;
     private final DrugMapRepository drugMapRepository;
 
+    private boolean relevance = false;
     private XMLParser parser = null;
     private int hashCode;
     private final Map<String, List<Pattern>> patternMap = new HashMap<>();
@@ -297,6 +298,7 @@ public class ArticleServiceImpl implements ArticleService {
 
 
     public void updateArticlesPubmed() {
+        populateDrugs();
         populateGenes();
         populateOncoBase();
     }
@@ -414,7 +416,8 @@ public class ArticleServiceImpl implements ArticleService {
         try {
             log.info("RUNNING PYTHON");
             XMLFile = "pubmed" + term.hashCode() + ".xml";
-            ProcessUtil.runScript("python3 python/pubmed.py " + size + " " + XMLFile + " " + term.trim());
+            String pythonScript = relevance ? "python/pubmed_relevance.py" : "python/pubmed.py";
+            ProcessUtil.runScript("python3 " + pythonScript + " " + size + " " + XMLFile + " " + term.trim());
         } catch (IOException e) {
             log.error(e.getMessage());
         }
@@ -481,7 +484,7 @@ public class ArticleServiceImpl implements ArticleService {
                 String XMLFile = "";
                 synchronized (this) {
                     try {
-                        TimeUnit.MILLISECONDS.sleep(50);
+                        TimeUnit.MILLISECONDS.sleep(100);
                     } catch (InterruptedException e) {
                         log.error("Somebody woke up the monster while sleeping, beware!");
                     }
@@ -558,6 +561,22 @@ public class ArticleServiceImpl implements ArticleService {
         runSearches(terms, 500);
     }
 
+    void populateDrugs() {
+        List<DrugMap> drugs = drugMapRepository.findCancerDrugs();
+        List<String> terms = new ArrayList<>();
+        for (DrugMap dm : drugs) {
+            String term = quote(dm.getDrug());
+            if (dm.getSynonyms() != null && dm.getSynonyms().length() > 0) {
+                String[] synonyms = dm.getSynonyms().split(",");
+                for (String s : synonyms) {
+                    term += " OR " + quote(s);
+                }
+            }
+            terms.add(term);
+        }
+        runSearches(terms, 50000);
+    }
+
     void populateDrugsRecent() {
         List<DrugMap> drugs = drugMapRepository.findCancerDrugs();
         List<String> terms = new ArrayList<>();
@@ -615,9 +634,14 @@ public class ArticleServiceImpl implements ArticleService {
             //p2.reload(XMLFile);
             p2.DFSFast(p2.getRoot(), Tree.articleTree(), null);
         } catch (NoSuchFieldException|IllegalAccessException|ParserConfigurationException|SAXException|IOException e) {
+            log.error("Error during parsing XML file");
             log.error(e.getMessage());
         }
         new File(XMLFile).delete();
+    }
+
+    public void setRelevance(boolean relevance) {
+        this.relevance = relevance;
     }
 
     public static String quote(String term) {

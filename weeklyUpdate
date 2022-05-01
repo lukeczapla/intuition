@@ -1,4 +1,4 @@
 #!/bin/bash
-
+export MAVEN_OPTS="-Xms12g"
 mvn -Dtest=SpringTest#pullDaily test
 
