@@ -48,6 +48,8 @@ mvn -Dtest=SpringTest#pullDaily test
 
 ```
 
+ - Script fullUpdate will totally refresh the articles, even from an empty MongoDB database with empty Apache SOLR.
+
  - Check that all citations have title/author/abstract/keywords/MeSH terms 
 downloaded - or use bash script updateCitations:
 

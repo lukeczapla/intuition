@@ -190,14 +190,17 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         List<ProjectList> pl = projectListRepository.findIdExpression("keywordListM");
         for (Variant v : variants) {
             // this line below if for resuming when the data is just being re-curated again and something disconnects or crashes
-            if (v.getLastUpdate() != null && v.getLastUpdate().isAfter(DateTime.now().minusHours(8))) continue;  //.minusDays(0))) continue;
+            if (v.getLastUpdate() != null && v.getLastUpdate().isAfter(DateTime.now().minusHours(12))) continue;  //.minusDays(0))) continue;
             String gene = v.getGene();
             String mutation = null;
             if (v.getMutation() != null) {
                 if (v.getMutation().toUpperCase().endsWith("FUSION")) mutation = v.getMutation().substring(0, v.getMutation().toUpperCase().indexOf(" FUSION"));
                 else mutation = v.getMutation();
             }
-            if (mutation != null && (mutation.equals("") || mutation.equals("Oncogenic Mutations"))) mutation = null;
+            if (mutation != null && (mutation.equals("") || mutation.equals("Oncogenic Mutations"))) {
+                log.info("Blank mutation or 'Oncogenic Mutations', continuing");
+                continue;
+            }
             //Optional<Target> ot = targetRepository.findBySymbol(gene);
             //List<String> geneSynonyms = ot.map(target -> Arrays.asList(escape(target.getSynonyms()).split(";"))).orElse(null);
             List<Target> targetList = targetRepository.findAllBySymbol(gene);  // treat multiple hits
