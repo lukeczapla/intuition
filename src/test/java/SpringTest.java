@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.magicat.MIND.SimulationMIND;
+import org.magicat.config.ScheduledTasks;
 import org.magicat.model.Article;
 import org.magicat.model.FullText;
 import org.magicat.model.GlobalTimestamp;
@@ -115,6 +116,7 @@ public class SpringTest {
 
     @Test
     void runFullUpdate() {
+        ScheduledTasks.updateArticles = false;
         articleService.setRelevance(true);
         int pageNumber = (int)(articleRepository.count() / 50000);
         articleService.updateArticlesPubmed();
@@ -125,6 +127,7 @@ public class SpringTest {
 
     @Test
     void followupCitations() {
+        ScheduledTasks.updateArticles = false;
         int pageNumber = 222;
         articleService.updateCitations(pageNumber, 50000);
         articleService.addCitationRecords(pageNumber, 50000);
@@ -328,6 +331,7 @@ public class SpringTest {
 
     @Test
     public void pullDaily() {
+        ScheduledTasks.updateArticles = false;
         Optional<GlobalTimestamp> ogt = globalTimestampRepository.findById("articles");
         if (ogt.isEmpty()) {
             log.error("BUMMER, gotta bounce there's an error in the daily pull!");

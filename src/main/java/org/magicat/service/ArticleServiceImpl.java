@@ -1,5 +1,6 @@
 package org.magicat.service;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang.WordUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -51,7 +52,8 @@ public class ArticleServiceImpl implements ArticleService {
     private final Map<String, List<Pattern>> patternMap = new HashMap<>();
 
     private int count = 0, runCount = 0;
-    private List<Article> processArticles = new ArrayList<>();
+    private List<Article> processArticles = new ArrayList<>();//Collections.synchronizedList(new ArrayList<>());
+    private List<String> pmidList = Collections.synchronizedList(new ArrayList<>());
 
     @Autowired
     public ArticleServiceImpl(ArticleRepository articleRepository, ProjectListRepository projectListRepository, CancerTypeRepository cancerTypeRepository,
@@ -233,14 +235,17 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     private int total = 0;
-    private String pmIdList = "";
 
     private void processQueueItems(List<Article> articleList) {
-        if (pmIdList.equals("")) return;
-        List<String> pmIds = Arrays.asList(pmIdList.split(","));
+        if (pmidList.size() == 0) return;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < pmidList.size(); i++) {
+            sb.append(pmidList.get(i));
+            if (i != pmidList.size()-1) sb.append(",");
+        }
         try {
             String XMLfile = "pubmed_ids.xml";
-            ProcessUtil.runScript("python3 python/pubmed_ids.py " + pmIdList);
+            ProcessUtil.runScript("python3 python/pubmed_ids.py " + sb);
             if (parser == null) {
                 parser = new XMLParser(XMLfile);
                 parser.setArticleRepository(articleRepository);
@@ -255,8 +260,9 @@ public class ArticleServiceImpl implements ArticleService {
                 }
                 parser.reload(XMLfile);
             }
-            parser.DFS(parser.getRoot(), Tree.articleTreeNoCitations(), null);
-            List<Article> articles = articleRepository.findAllByPmIdIn(pmIds);
+            // changed from regular DFS to DFSFast! 5/3/2022
+            parser.DFSFast(parser.getRoot(), Tree.articleTreeNoCitations(), null);
+            List<Article> articles = articleRepository.findAllByPmIdIn(pmidList);
             articles.parallelStream().forEach(a -> {
                 if (a.getJournal() != null) {
                     DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy MMM");
@@ -273,7 +279,6 @@ public class ArticleServiceImpl implements ArticleService {
                 }
             });
             if (new File(XMLfile).delete()) log.info("Deleted XMLfile");
-            pmIdList = "";
 
         } catch (IOException | ParserConfigurationException | SAXException | NoSuchFieldException | IllegalAccessException e) {
             log.error(e.getMessage());
@@ -287,8 +292,7 @@ public class ArticleServiceImpl implements ArticleService {
             return;
         }
         if (article.getCitation() == null) {
-            if (pmIdList.equals("")) pmIdList += article.getPmId();
-            else pmIdList += ","+article.getPmId();
+            pmidList.add(article.getPmId());
             total++;
             if (total % size == 0) {
                 processQueueItems(articleList);
@@ -318,7 +322,7 @@ public class ArticleServiceImpl implements ArticleService {
         Page<Article> pages;
         do {
             pages = articleRepository.findAll(PageRequest.of(pageNumber++, pageLimit));
-            processArticles(pages.getContent(), pageNumber);
+            processArticles(pages.getContent());
         } while (pages.hasNext());
         log.info("Total items: " + pages.getTotalElements());
         if (processArticles.size() > 0) {
@@ -329,8 +333,9 @@ public class ArticleServiceImpl implements ArticleService {
             }
             try {
                 ProcessUtil.runScript("python3 python/pubmed_list.py " + items);
-                parser.reload("pubmed_list.xml");
-                parser.DFS(parser.getRoot(), Tree.articleTreeNoCitations(), null);
+                if (parser == null) parser = new XMLParser("pubmed_list.xml");
+                else parser.reload("pubmed_list.xml");
+                parser.DFSFast(parser.getRoot(), Tree.articleTreeNoCitations(), null);
             } catch (Exception e) {
                 log.error("Error occurred: " + e.getMessage());
             }
@@ -341,7 +346,34 @@ public class ArticleServiceImpl implements ArticleService {
         updateCitations(0, 50000);
     }
 
-    private void processArticles(List<Article> articles, int pageNumber) {
+    private void processArticles(List<Article> articles) {
+        articles.parallelStream().filter(a -> a.getTitle() == null && a.getCitation() != null).forEach(article -> processArticles.add(article));
+        if (processArticles.size() > 0) {
+            for (List<Article> processBatch: Lists.partition(processArticles, 500)) {
+                StringBuilder items = new StringBuilder();
+                for (int i = 0; i < processBatch.size(); i++) {
+                    if (i == 0) items.append(processArticles.get(i).getPmId().trim());
+                    else items.append(",").append(processArticles.get(i).getPmId().trim());
+                }
+                try {
+                    if (runCount == 0) {
+                        ProcessUtil.runScript("python3 python/pubmed_list.py " + items);
+                        setupProcess();
+                        parser.DFSFast(parser.getRoot(), Tree.articleTreeNoCitations(), null);
+                    } else {
+                        ProcessUtil.runScript("python3 python/pubmed_list.py " + items);
+                        parser.reload("pubmed_list.xml");
+                        parser.DFSFast(parser.getRoot(), Tree.articleTreeNoCitations(), null);
+                    }
+                    runCount++;
+                } catch (Exception e) {
+                    log.error("Error occurred: " + e.getMessage());
+                    //System.exit(-1);
+                }
+            }
+            processArticles = new ArrayList<>();//Collections.synchronizedList(new ArrayList<>());
+        }
+        /*
         for (Article article: articles) {
             if (article.getTitle() == null && article.getCitation() != null) {
                 processArticles.add(article);
@@ -370,6 +402,7 @@ public class ArticleServiceImpl implements ArticleService {
                 }
             }
         }
+         */
     }
 
     private void setupProcess() {
@@ -511,15 +544,13 @@ public class ArticleServiceImpl implements ArticleService {
             pages = articleRepository.findAll(PageRequest.of(pageNumber, pageSize));
             articleList = pages.getContent();
             log.info("Total articles in page " + pageNumber + ": " + articleList.size());
-            for (Article article : articleList) {
-                if (article.getCitation() == null) {
-                    log.info("Updating citation for " + article.getPmId());
-                    addCitationQueue(article, articleList, 200);
-                }
+            articleList.parallelStream().filter(a -> a.getCitation() == null).forEach(a -> pmidList.add(a.getPmId()));
+            if (pmidList.size() > 500) {
+                processQueueItems(articleList);
             }
             pageNumber++;
         } while (pages.hasNext());
-        addCitationQueue(null, articleList, 200);
+        if (pmidList.size() > 0) processQueueItems(articleList);
     }
 
 

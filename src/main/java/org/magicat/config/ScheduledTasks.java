@@ -20,6 +20,9 @@ public class ScheduledTasks {
 
     private final static Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
 
+    public static boolean updateArticles = true;
+    private static int count = -1;
+
     private final MapService mapService;
     private final ArticleService articleService;
     private final ArticleRepository articleRepository;
@@ -54,8 +57,9 @@ public class ScheduledTasks {
 
     @Scheduled(fixedDelay = 3000*3600)
     public void checkArticles() {
+        count++;
         Optional<GlobalTimestamp> ogt = globalTimestampRepository.findById("articles");
-        if (ogt.isPresent() && ogt.get().getAfter().isBeforeNow()) {
+        if (updateArticles && count > 0 && ogt.isPresent() && ogt.get().getAfter().isBeforeNow()) {
             log.info("{} - The aliens are landing! (UPDATING ARTICLES)", DateTime.now());
             new Thread(() -> {
                 GlobalTimestamp gt = ogt.get();

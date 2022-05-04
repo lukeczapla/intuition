@@ -1,4 +1,3 @@
-//mongoimport --db antibody --collection Targets --authenticationDatabase admin --username root --password th3futur3 --drop --file target
 
 export const lettercodes =
 [{"A" : ["Ala", "Alanine"]},
