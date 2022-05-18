@@ -88,9 +88,9 @@ http://localhost:7050/intuition/swagger-ui/
 The Swagger documentation for the backend.
 
 
-## Old deployment on AIML server (internal use)
+## Old deployment on AIML server (previously in use for OncoKB curators)
 
-https://aimlcoe.mskcc.org/knowledge/swagger-ui/
+https://aimlcoe/knowledge/swagger-ui/
 
 
 
