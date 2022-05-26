@@ -27,7 +27,7 @@ public class GeneMap {
 
     private Integer[] pmIds;
 
-    private String synonyms;
+    private String synonyms = null;
 
 
     public String getSymbol() {

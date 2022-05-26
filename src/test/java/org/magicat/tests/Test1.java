@@ -39,16 +39,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.magicat.MIND.SimulationMIND;
 import org.magicat.controller.ArticleController;
 import org.magicat.controller.VariantController;
+import org.magicat.model.*;
 import org.magicat.model.xml.UpdateConfig;
 import org.magicat.model.xml.UpdateItems;
 import org.magicat.montecarlo.MCNetwork;
 import org.magicat.pdf.PDFHighlighter;
 import org.magicat.pdf.Section;
-import org.magicat.repository.*;
-import org.magicat.repository.FullTextRepository;
-import org.magicat.service.*;
-import org.magicat.util.*;
-import org.magicat.model.*;
 import org.magicat.repository.*;
 import org.magicat.service.*;
 import org.magicat.util.*;
@@ -173,6 +169,31 @@ public class Test1 {
         for (Map.Entry<String, Integer> journal : list) {
             System.out.println(journal.getKey() + " " + journal.getValue());
         }
+    }
+
+    @Test
+    public void addGeneSynonyms() {
+        //GeneMap was = new GeneMap("was", null);
+        //geneMapRepository.insert(was);
+        List<GeneMap> genes = geneMapRepository.findAll();
+        genes.forEach(gene -> {
+            List<Target> targets = targetRepository.findAllBySymbol(gene.getSymbol().toUpperCase());
+            final Set<String> synonyms = new HashSet<>();
+            targets.forEach(t -> {
+                String[] names = t.getSynonyms().split(";");
+                for (String syn : names) synonyms.add(syn.toUpperCase());
+            });
+            if (synonyms.size() > 0) {
+                String result = "";
+                Iterator<String> it = synonyms.iterator();
+                while (it.hasNext()) {
+                    result += it.next();
+                    if (it.hasNext()) result += ";";
+                }
+                gene.setSynonyms(result);
+                geneMapRepository.save(gene);
+            }
+        });
     }
 
     @Test

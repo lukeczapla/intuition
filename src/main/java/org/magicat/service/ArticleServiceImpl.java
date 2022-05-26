@@ -321,12 +321,13 @@ public class ArticleServiceImpl implements ArticleService {
     public void updateCitations(int pageNumber, int pageLimit) {
         Page<Article> pages;
         do {
+            log.info("Page {} of size {}", pageNumber, pageLimit);
             pages = articleRepository.findAll(PageRequest.of(pageNumber++, pageLimit));
             processArticles(pages.getContent());
         } while (pages.hasNext());
         log.info("Total items: " + pages.getTotalElements());
-        if (processArticles.size() > 0) {
-            StringBuilder items = new StringBuilder();
+        if (processArticles.size() > 0) processArticles(null);
+            /*{StringBuilder items = new StringBuilder();
             for (int i = 0; i < processArticles.size(); i++) {
                 if (i == 0) items.append(processArticles.get(i).getPmId().trim());
                 else items.append(",").append(processArticles.get(i).getPmId().trim());
@@ -338,8 +339,7 @@ public class ArticleServiceImpl implements ArticleService {
                 parser.DFSFast(parser.getRoot(), Tree.articleTreeNoCitations(), null);
             } catch (Exception e) {
                 log.error("Error occurred: " + e.getMessage());
-            }
-        }
+            }}*/
     }
 
     public void updateCitations() {
@@ -347,7 +347,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     private void processArticles(List<Article> articles) {
-        articles.parallelStream().filter(a -> a.getTitle() == null && a.getCitation() != null).forEach(article -> processArticles.add(article));
+        if (articles != null) articles.parallelStream().filter(a -> a.getTitle() == null && a.getCitation() != null).forEach(article -> processArticles.add(article));
         if (processArticles.size() > 0) {
             for (List<Article> processBatch: Lists.partition(processArticles, 500)) {
                 StringBuilder items = new StringBuilder();
@@ -512,7 +512,8 @@ public class ArticleServiceImpl implements ArticleService {
     public void runSearches(List<String> terms, int size) {
         Collections.shuffle(terms); // ensures that any error from throttling at the beginning is evenly distributed
         if (indexArticles()) {
-            final Semaphore concurrentDFSExecutions = new Semaphore(16);
+            // 8 processes allowed into the system for less traffic, less failures
+            final Semaphore concurrentDFSExecutions = new Semaphore(8);
             terms.parallelStream().forEach((g) -> {
                 String XMLFile = "";
                 synchronized (this) {

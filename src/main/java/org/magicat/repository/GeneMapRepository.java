@@ -20,17 +20,17 @@ public interface GeneMapRepository extends MongoRepository<GeneMap, String> {
     List<GeneMap> findAllSymbols();
 
     @NotNull
-    @Secured("ROLE_ADMIN")
+    //@Secured("ROLE_ADMIN")
     @Override
     <S extends GeneMap> List<S> saveAll(@NotNull Iterable<S> entities);
 
     @NotNull
-    @Secured("ROLE_ADMIN")
+    //@Secured("ROLE_ADMIN")
     @Override
     <S extends GeneMap> S insert(@NotNull S entity);
 
     @NotNull
-    @Secured("ROLE_ADMIN")
+    //@Secured("ROLE_ADMIN")
     @Override
     <S extends GeneMap> List<S> insert(@NotNull Iterable<S> entities);
 

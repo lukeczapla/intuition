@@ -170,14 +170,14 @@ public class SpringTest {
         for (Article article: articles) {
             if (article.getTitle() == null && article.getCitation() != null) {
                 processArticles.add(article);
-                if (processArticles.size() > 199) {
+                if (processArticles.size() >= 500) {
                     StringBuilder items = new StringBuilder();
                     for (int i = 0; i < processArticles.size(); i++) {
                         if (i == 0) items.append(processArticles.get(i).getPmId().trim());
                         else items.append(",").append(processArticles.get(i).getPmId().trim());
                     }
                     try {
-                        if (runCount == 0) {
+                        if (runCount == 0 || parser == null) {
                             ProcessUtil.runScript("python3 python/pubmed_list.py " + items.toString());
                             setupProcess();
                             parser.DFS(parser.getRoot(), Tree.articleTreeNoCitations(), null);
