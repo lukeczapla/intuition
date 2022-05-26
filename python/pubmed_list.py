@@ -62,8 +62,9 @@ def get_str_id_content(idstr):
         url=f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id={idstr}&rettype=text"
     )
 
-    file1 = open("pubmed_list.xml", "wb")
-    file1.write(res.content)
+    file1 = open("pubmed_list.xml", "w")
+    file1.write(res.text)   # res.content is bytes
+    file1.write("\n\n") 
     file1.close()
 
 

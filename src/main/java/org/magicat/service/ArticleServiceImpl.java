@@ -52,7 +52,7 @@ public class ArticleServiceImpl implements ArticleService {
     private final Map<String, List<Pattern>> patternMap = new HashMap<>();
 
     private int count = 0, runCount = 0;
-    private List<Article> processArticles = new ArrayList<>();//Collections.synchronizedList(new ArrayList<>());
+    private List<Article> processArticles = Collections.synchronizedList(new ArrayList<>());//Collections.synchronizedList(new ArrayList<>());
     private List<String> pmidList = Collections.synchronizedList(new ArrayList<>());
 
     @Autowired
@@ -346,8 +346,16 @@ public class ArticleServiceImpl implements ArticleService {
                 }
                 try {
                     //if (runCount == 0) {
-                    ProcessUtil.runScript("python3 python/pubmed_list.py " + items);
-                    setupProcess();
+                    boolean valid = false;
+                    do {
+                        try {
+                            ProcessUtil.runScript("python3 python/pubmed_list.py " + items);
+                            setupProcess();
+                            valid = true;
+                        } catch (IOException e) {
+                            log.error("Error: {}", e.getMessage());
+                        }
+                    } while (!valid);
                     parser.DFSFast(parser.getRoot(), Tree.articleTreeNoCitations(), null);
                     /*} else {
                         ProcessUtil.runScript("python3 python/pubmed_list.py " + items);
@@ -359,25 +367,32 @@ public class ArticleServiceImpl implements ArticleService {
                     log.error("Error occurred: " + e.getMessage());
                 }
             }
-            processArticles = new ArrayList<>();//Collections.synchronizedList(new ArrayList<>());
+            processArticles = Collections.synchronizedList(new ArrayList<>());//Collections.synchronizedList(new ArrayList<>());
         }
     }
 
-    private void setupProcess() {
+    private void setupProcess() throws Exception {
         // we may have previously been pulling the most recent articles with all PMIDs loaded
         if (parser != null) {
-            parser.reload("pubmed_list.xml");
-            return;
+            try {
+                parser.reload("pubmed_list.xml");
+                return;
+            } catch (IOException|ParserConfigurationException|SAXException e) {
+                throw e;
+            }
         }
         try {
-            parser = new XMLParser("pubmed_list.xml");
+            parser = new XMLParser("demo.xml");
             log.info("Reading in all article PMIDs");
             List<Article> articles = articleRepository.findAllPmId();
             parser.setDb(articles);
             parser.setArticleRepository(articleRepository);
             log.info("Completed reading in {} articles", articles.size());
-        } catch (Exception e) {
+            parser.reload("pubmed_list.xml");
+        } catch (IOException|ParserConfigurationException|SAXException e) {
             log.error(e.getMessage() + " in setupProcess() of ArticleServiceImpl.java");
+            parser = null;
+            throw new IOException("Invalid XML file");
         }
     }
 
@@ -434,15 +449,6 @@ public class ArticleServiceImpl implements ArticleService {
         return XMLFile;
     }
 
-    public void runSearchComplete(String XMLFile) {
-        parser.reload(XMLFile);
-        try {
-            parser.DFSFast(parser.getRoot(), Tree.articleTree(), null);
-        } catch (NoSuchFieldException|IllegalAccessException e) {
-            log.error(e.getMessage());
-        }
-        new File(XMLFile).delete();
-    }
 
     public void runSearch(String term, int size, int count) {
         if (term == null) return;

@@ -52,7 +52,7 @@ public class XMLParser {
         return parser;
     }
 
-    public void reload(String file) {
+    public void reload(String file) throws IOException, SAXException, ParserConfigurationException {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             //factory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
@@ -67,6 +67,7 @@ public class XMLParser {
             //e.printStackTrace();
             log.error("Error occurred in reload");
             log.error(e.getMessage());
+            throw e;
         }
     }
 
