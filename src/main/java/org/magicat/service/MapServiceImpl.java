@@ -141,7 +141,7 @@ public class MapServiceImpl implements MapService {
         item = terms.get("mutation");
         itemList = new ArrayList<>(item.keySet()).subList(mutationIndexes.get(batch).first(), mutationIndexes.get(batch).second());
         for (String mutation : itemList) {
-            List<String> pmIdsRaw = solrService.searchSolr(500000, null, null, Collections.singletonList(mutation), Collections.singletonList(item.get(mutation)), null, null, null, null, null, null, null).getPmIds();
+            List<String> pmIdsRaw = solrService.searchSolr(1000000, null, null, Collections.singletonList(mutation), Collections.singletonList(item.get(mutation)), null, null, null, null, null, null, null).getPmIds();
             final Map<String, String> supportingText = new HashMap<>();
             List<String> pmIdsWithDuplicates = pmIdsRaw.stream().map(s -> {
                 if (s.contains("S")) {
@@ -167,7 +167,7 @@ public class MapServiceImpl implements MapService {
         item = terms.get("drug");
         itemList = new ArrayList<>(item.keySet()).subList(drugIndexes.get(batch).first(), drugIndexes.get(batch).second());
         for (String drug : itemList) {
-            List<String> pmIdsRaw = solrService.searchSolr(500000, null, null, null, null, Collections.singletonList(drug),null, null, null, null, null, null).getPmIds();
+            List<String> pmIdsRaw = solrService.searchSolr(1000000, null, null, null, null, Collections.singletonList(drug),null, null, null, null, null, null).getPmIds();
             final Map<String, String> supportingText = new HashMap<>();
             List<String> pmIdsWithDuplicates = pmIdsRaw.stream().map(s -> {
                 if (s.contains("S")) {

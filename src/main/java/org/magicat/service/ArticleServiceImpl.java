@@ -327,19 +327,6 @@ public class ArticleServiceImpl implements ArticleService {
         } while (pages.hasNext());
         log.info("Total items: " + pages.getTotalElements());
         if (processArticles.size() > 0) processArticles(null);
-            /*{StringBuilder items = new StringBuilder();
-            for (int i = 0; i < processArticles.size(); i++) {
-                if (i == 0) items.append(processArticles.get(i).getPmId().trim());
-                else items.append(",").append(processArticles.get(i).getPmId().trim());
-            }
-            try {
-                ProcessUtil.runScript("python3 python/pubmed_list.py " + items);
-                if (parser == null) parser = new XMLParser("pubmed_list.xml");
-                else parser.reload("pubmed_list.xml");
-                parser.DFSFast(parser.getRoot(), Tree.articleTreeNoCitations(), null);
-            } catch (Exception e) {
-                log.error("Error occurred: " + e.getMessage());
-            }}*/
     }
 
     public void updateCitations() {
@@ -347,62 +334,33 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     private void processArticles(List<Article> articles) {
-        if (articles != null) articles.parallelStream().filter(a -> a.getTitle() == null && a.getCitation() != null).forEach(article -> processArticles.add(article));
+        if (articles != null) articles.parallelStream().filter(a -> a != null && a.getTitle() == null && a.getCitation() != null).forEach(article -> processArticles.add(article));
         if (processArticles.size() > 5000 || (articles == null && processArticles.size() > 0)) {
             for (List<Article> processBatch: Lists.partition(processArticles, 500)) {
                 StringBuilder items = new StringBuilder();
                 for (int i = 0; i < processBatch.size(); i++) {
-                    if (i == 0) items.append(processBatch.get(i).getPmId().trim());
-                    else items.append(",").append(processBatch.get(i).getPmId().trim());
+                    if (processBatch.get(i) != null) {
+                        if (i == 0) items.append(processBatch.get(i).getPmId().trim());
+                        else items.append(",").append(processBatch.get(i).getPmId().trim());
+                    }
                 }
                 try {
-                    if (runCount == 0) {
-                        ProcessUtil.runScript("python3 python/pubmed_list.py " + items);
-                        setupProcess();
-                        parser.DFSFast(parser.getRoot(), Tree.articleTreeNoCitations(), null);
-                    } else {
+                    //if (runCount == 0) {
+                    ProcessUtil.runScript("python3 python/pubmed_list.py " + items);
+                    setupProcess();
+                    parser.DFSFast(parser.getRoot(), Tree.articleTreeNoCitations(), null);
+                    /*} else {
                         ProcessUtil.runScript("python3 python/pubmed_list.py " + items);
                         parser.reload("pubmed_list.xml");
                         parser.DFSFast(parser.getRoot(), Tree.articleTreeNoCitations(), null);
-                    }
+                    }*/
                     runCount++;
                 } catch (Exception e) {
                     log.error("Error occurred: " + e.getMessage());
-                    //System.exit(-1);
                 }
             }
             processArticles = new ArrayList<>();//Collections.synchronizedList(new ArrayList<>());
         }
-        /*
-        for (Article article: articles) {
-            if (article.getTitle() == null && article.getCitation() != null) {
-                processArticles.add(article);
-                if (processArticles.size() > 197) {
-                    StringBuilder items = new StringBuilder();
-                    for (int i = 0; i < processArticles.size(); i++) {
-                        if (i == 0) items.append(processArticles.get(i).getPmId().trim());
-                        else items.append(",").append(processArticles.get(i).getPmId().trim());
-                    }
-                    try {
-                        if (runCount == 0) {
-                            ProcessUtil.runScript("python3 python/pubmed_list.py " + items);
-                            setupProcess();
-                            parser.DFS(parser.getRoot(), Tree.articleTreeNoCitations(), null);
-                        } else {
-                            ProcessUtil.runScript("python3 python/pubmed_list.py " + items);
-                            parser.reload("pubmed_list.xml");
-                            parser.DFS(parser.getRoot(), Tree.articleTreeNoCitations(), null);
-                        }
-                        runCount++;
-                    } catch (Exception e) {
-                        log.error("Error occurred: " + e.getMessage());
-                        //System.exit(-1);
-                    }
-                    processArticles = new ArrayList<>();
-                }
-            }
-        }
-         */
     }
 
     private void setupProcess() {
