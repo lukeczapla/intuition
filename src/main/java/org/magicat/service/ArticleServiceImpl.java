@@ -348,12 +348,12 @@ public class ArticleServiceImpl implements ArticleService {
 
     private void processArticles(List<Article> articles) {
         if (articles != null) articles.parallelStream().filter(a -> a.getTitle() == null && a.getCitation() != null).forEach(article -> processArticles.add(article));
-        if (processArticles.size() > 0) {
+        if (processArticles.size() > 5000 || (articles == null && processArticles.size() > 0)) {
             for (List<Article> processBatch: Lists.partition(processArticles, 500)) {
                 StringBuilder items = new StringBuilder();
                 for (int i = 0; i < processBatch.size(); i++) {
-                    if (i == 0) items.append(processArticles.get(i).getPmId().trim());
-                    else items.append(",").append(processArticles.get(i).getPmId().trim());
+                    if (i == 0) items.append(processBatch.get(i).getPmId().trim());
+                    else items.append(",").append(processBatch.get(i).getPmId().trim());
                 }
                 try {
                     if (runCount == 0) {
