@@ -238,51 +238,54 @@ public class ArticleServiceImpl implements ArticleService {
 
     private void processQueueItems(List<Article> articleList) {
         if (pmidList.size() == 0) return;
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < pmidList.size(); i++) {
-            sb.append(pmidList.get(i));
-            if (i != pmidList.size()-1) sb.append(",");
-        }
-        try {
-            String XMLfile = "pubmed_ids.xml";
-            ProcessUtil.runScript("python3 python/pubmed_ids.py " + sb);
-            if (parser == null) {
-                parser = new XMLParser(XMLfile);
-                parser.setArticleRepository(articleRepository);
-                parser.setDb(articleList);
-                hashCode = articleList.hashCode();
-            } else {
-                if (hashCode != articleList.hashCode()) {
-                    log.info("Loading new List<Article>");
-                    //parser.clearDb();
+        Lists.partition(pmidList, 200).forEach(mylist -> {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < mylist.size(); i++) {
+                sb.append(mylist.get(i));
+                if (i != mylist.size() - 1) sb.append(",");
+            }
+            try {
+                String XMLfile = "pubmed_ids.xml";
+                ProcessUtil.runScript("python3 python/pubmed_ids.py " + sb);
+                if (parser == null) {
+                    parser = new XMLParser(XMLfile);
+                    parser.setArticleRepository(articleRepository);
                     parser.setDb(articleList);
                     hashCode = articleList.hashCode();
-                }
-                parser.reload(XMLfile);
-            }
-            // changed from regular DFS to DFSFast! 5/3/2022
-            parser.DFSFast(parser.getRoot(), Tree.articleTreeNoCitations(), null);
-            List<Article> articles = articleRepository.findAllByPmIdIn(pmidList);
-            articles.parallelStream().forEach(a -> {
-                if (a.getJournal() != null) {
-                    DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy MMM");
-                    a.setCitation(WordUtils.capitalizeFully(a.getJournal()) + " " + (a.getPubDate() != null ? a.getPubDate().toString(fmt) + "; " : "") + (a.getVolume() != null ? a.getVolume() : "") + (a.getIssue() != null ? "(" + a.getIssue() + ")" : "") + (a.getPageNumbers() != null ? ":" + a.getPageNumbers() : ""));
-                    articleRepository.save(a);
-                    log.info("Successfully set citation for " + a.getPmId());
-                    //log.info("Has pubDate = " + (article.getPubDate() != null ? "Check: " + article.getPubDate().toString(fmt) : "X"));
-                    //log.info("Has volume = " + (article.getVolume() != null ? "Check" : "X"));
-                    //log.info("Has issue = " + (article.getIssue() != null ? "Check" : "X"));
-                    //log.info("Has pageNumber = " + (article.getPageNumbers() != null ? "Check" : "X"));
-
                 } else {
-                    log.info("Not enough information to set citation (journal + date + volume etc.) record for " + a.getPmId());
+                    if (hashCode != articleList.hashCode()) {
+                        log.info("Loading new List<Article>");
+                        //parser.clearDb();
+                        parser.setDb(articleList);
+                        hashCode = articleList.hashCode();
+                    }
+                    parser.reload(XMLfile);
                 }
-            });
-            if (new File(XMLfile).delete()) log.info("Deleted XMLfile");
+                // changed from regular DFS to DFSFast! 5/3/2022
+                parser.DFSFast(parser.getRoot(), Tree.articleTreeNoCitations(), null);
+                List<Article> articles = articleRepository.findAllByPmIdIn(pmidList);
+                if (articles.parallelStream().filter(a -> a.getCitation() == null).count() > 0) {
+                    articles.parallelStream().filter(a -> a.getCitation() == null).forEach(a -> {
+                        if (a.getJournal() != null) {
+                            DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy MMM");
+                            a.setCitation(WordUtils.capitalizeFully(a.getJournal()) + " " + (a.getPubDate() != null ? a.getPubDate().toString(fmt) + "; " : "") + (a.getVolume() != null ? a.getVolume() : "") + (a.getIssue() != null ? "(" + a.getIssue() + ")" : "") + (a.getPageNumbers() != null ? ":" + a.getPageNumbers() : ""));
+                            articleRepository.save(a);
+                            log.info("Successfully set citation for " + a.getPmId());
+                            //log.info("Has pubDate = " + (article.getPubDate() != null ? "Check: " + article.getPubDate().toString(fmt) : "X"));
+                            //log.info("Has volume = " + (article.getVolume() != null ? "Check" : "X"));
+                            //log.info("Has issue = " + (article.getIssue() != null ? "Check" : "X"));
+                            //log.info("Has pageNumber = " + (article.getPageNumbers() != null ? "Check" : "X"));
 
-        } catch (IOException | ParserConfigurationException | SAXException | NoSuchFieldException | IllegalAccessException e) {
-            log.error(e.getMessage());
-        }
+                        } else {
+                            log.info("Not enough information to set citation (journal + date + volume etc.) record for " + a.getPmId());
+                        }
+                    });
+                    if (new File(XMLfile).delete()) log.info("Deleted XMLfile");
+                }
+            } catch (IOException | ParserConfigurationException | SAXException | NoSuchFieldException | IllegalAccessException e) {
+                log.error(e.getMessage());
+            }
+        });
     }
 
     @Override
@@ -336,7 +339,7 @@ public class ArticleServiceImpl implements ArticleService {
     private void processArticles(List<Article> articles) {
         if (articles != null) articles.parallelStream().filter(a -> a != null && a.getTitle() == null && a.getCitation() != null).forEach(article -> processArticles.add(article));
         if (processArticles.size() > 5000 || (articles == null && processArticles.size() > 0)) {
-            for (List<Article> processBatch: Lists.partition(processArticles, 500)) {
+            for (List<Article> processBatch: Lists.partition(processArticles, 200)) {
                 StringBuilder items = new StringBuilder();
                 for (int i = 0; i < processBatch.size(); i++) {
                     if (processBatch.get(i) != null) {
@@ -506,11 +509,12 @@ public class ArticleServiceImpl implements ArticleService {
         Page<Article> pages;
         List<Article> articleList;
         do {
+            log.info("Reading page {} of size {}", pageNumber, pageSize);
             pages = articleRepository.findAll(PageRequest.of(pageNumber, pageSize));
             articleList = pages.getContent();
             log.info("Total articles in page " + pageNumber + ": " + articleList.size());
             articleList.parallelStream().filter(a -> a.getCitation() == null).forEach(a -> pmidList.add(a.getPmId()));
-            if (pmidList.size() > 500) {
+            if (pmidList.size() > 2000) {
                 processQueueItems(articleList);
             }
             pageNumber++;

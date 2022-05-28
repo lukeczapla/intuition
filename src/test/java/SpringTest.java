@@ -128,9 +128,10 @@ public class SpringTest {
     @Test
     void followupCitations() {
         ScheduledTasks.updateArticles = false;
-        int pageNumber = 222;
-        articleService.updateCitations(pageNumber, 50000);
+        int pageNumber = 330;
+        //articleService.updateCitations(pageNumber, 50000);
         articleService.addCitationRecords(pageNumber, 50000);
+        pageNumber = 222;
         solrService.updateSolrArticles(pageNumber, 50000);
     }
 
@@ -305,7 +306,7 @@ public class SpringTest {
     @Test
     public void updateSolr() {
         //solrService.addArticle("27880995");
-        solrService.updateSolrArticles(0, 50000);
+        solrService.updateSolrArticles(222, 50000);
     }
 
     @Test
