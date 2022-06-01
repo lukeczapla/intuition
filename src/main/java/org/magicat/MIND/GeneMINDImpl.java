@@ -1,16 +1,22 @@
 package org.magicat.MIND;
 
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
+import org.apache.solr.common.SolrDocumentList;
+import org.magicat.model.SequenceItem;
 import org.magicat.model.Target;
 import org.magicat.model.Variant;
 import org.magicat.repository.TargetRepository;
 import org.magicat.repository.VariantRepository;
 import org.magicat.service.SolrService;
 import org.magicat.service.TextService;
+import org.magicat.util.SolrClientTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
@@ -59,6 +65,56 @@ public class GeneMINDImpl implements GeneMIND, Serializable {
 
     public Set<String> getKinases() {
         return targetRepository.findAllByFamily("Kinase").parallelStream().map(Target::getSymbol).collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    private String wildcard(String seq, int n) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < seq.length()+n; i++) {
+            if (i != 0 && i % 5 == 0) result.append(" ");
+            if (i < n) result.append("?");
+            else result.append(seq.charAt(i-n));
+        }
+        if ((seq.length()+n) % 5 != 0) result.append("?".repeat(5 - (seq.length() + n) % 5));
+        return result.toString();
+    }
+
+    private String complement(String seq) {
+        StringBuilder result = new StringBuilder();
+        for (int i = seq.length()-1; i >= 0; i--) {
+            if (Character.toLowerCase(seq.charAt(i)) == 'a') result.append("t");
+            else if (Character.toLowerCase(seq.charAt(i)) == 't') result.append("a");
+            else if (Character.toLowerCase(seq.charAt(i)) == 'g') result.append("c");
+            else if (Character.toLowerCase(seq.charAt(i)) == 'c') result.append("g");
+            else result.append("?");
+        }
+        return result.toString();
+    }
+
+    @Override
+    public List<SequenceItem> findSequence(String seq) {
+        SolrClientTool solrClientTool = solrService.getSolrClientTool();
+        solrClientTool.setCollection("t2t");
+        solrClientTool.setParser("lucene");
+        StringBuilder query = new StringBuilder();
+        query.append("{!complexphrase inOrder=true}");
+        for (int i = 0; i < 5; i++) {
+            query.append("seq:\"").append(wildcard(seq, i)).append("\" OR ");
+        }
+        String cseq = complement(seq);
+        query.append("seq:\"").append(wildcard(cseq,0)).append("\" OR ");
+        query.append("seq:\"").append(wildcard(cseq,1)).append("\" OR ");
+        query.append("seq:\"").append(wildcard(cseq,2)).append("\" OR ");
+        query.append("seq:\"").append(wildcard(cseq,3)).append("\" OR ");
+        query.append("seq:\"").append(wildcard(cseq,4)).append("\"");
+
+        try {
+            SolrDocumentList sdl = solrClientTool.find("t2t", query.toString());
+            DocumentObjectBinder binder = new DocumentObjectBinder();
+            return binder.getBeans(SequenceItem.class, sdl);
+        } catch (SolrServerException|IOException e) {
+            log.error("Error searching genome: {}", e.getMessage());
+        }
+        return null;
     }
 
     @Override

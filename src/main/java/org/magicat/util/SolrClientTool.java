@@ -60,6 +60,10 @@ public class SolrClientTool {
     private static int count = 0;
     private int reloadRate = 15000;
 
+    private String defaultField;
+    private String collection;
+    private String parser = "edismax";
+
     @AllArgsConstructor
     @Getter
     @Setter
@@ -69,8 +73,6 @@ public class SolrClientTool {
         private Map<String, Map<String, List<String>>> highlightingMap;
     }
 
-    private String defaultField;
-    private String collection;
 
     public SolrClientTool() {
         if (cloud) HttpClientUtil.addRequestInterceptor(new SolrPreemptiveAuthInterceptor());
@@ -162,9 +164,9 @@ public class SolrClientTool {
         SolrQuery query = new SolrQuery();
         query.setQuery(queryText).setStart(0).setRows(10000).setIncludeScore(true);
         query.setParam("mm", "100%");
-        query.setParam("df", defaultField).setParam("defType", "edismax"); // lucene or edismax (or dismax, etc)
+        query.setParam("df", defaultField).setParam("defType", getParser()); // lucene or edismax (or dismax, etc)
         QueryResponse response = client.query(collection, query);
-        if (response.getClusteringResponse() != null && response.getClusteringResponse().getClusters() != null) {
+        /*if (response.getClusteringResponse() != null && response.getClusteringResponse().getClusters() != null) {
             List<Cluster> clusters = response.getClusteringResponse().getClusters();
             int item = 1;
             for (Cluster c : clusters) {
@@ -183,7 +185,7 @@ public class SolrClientTool {
                 }
                 item++;
             }
-        }
+        }*/
         SolrDocumentList results = response.getResults();
         if (results.size() == 0) {
             log.info("No Solr query results found for {}", queryText);
@@ -609,6 +611,14 @@ public class SolrClientTool {
 
     public void setReloadRate(int reloadRate) {
         this.reloadRate = reloadRate;
+    }
+
+    public String getParser() {
+        return parser;
+    }
+
+    public void setParser(String parser) {
+        this.parser = parser;
     }
 
     public static String escape(String s) {

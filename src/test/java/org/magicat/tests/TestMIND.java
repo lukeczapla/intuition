@@ -1,13 +1,30 @@
 package org.magicat.tests;
 
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrDocumentList;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.magicat.MIND.GeneMIND;
+import org.magicat.MIND.StructureMIND;
+import org.magicat.model.SequenceItem;
+import org.magicat.model.Target;
+import org.magicat.repository.TargetRepository;
+import org.magicat.util.SolrClientTool;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 public class TestMIND {
-/*
+
     @Autowired
     GeneMIND geneMIND;
     @Autowired
@@ -19,6 +36,15 @@ public class TestMIND {
     public void testGeneMIND() {
         System.out.println(geneMIND.getSymbols());
     }
+
+    @Test
+    void testSeqSearch() {
+        List<SequenceItem> sequences = geneMIND.findSequence("atgcgaaagtcga");
+        if (sequences != null && sequences.size() > 0) for (SequenceItem s: sequences) {
+            System.out.println(s.getChromosome() + " : " + s.getSeq());
+        }
+    }
+
 
     @Test
     public void testPage() {
@@ -56,5 +82,5 @@ public class TestMIND {
     public void testAblStructures() {
         structureMIND.analyzeStructures(structureMIND.getStructures());
     }
-*/
+
 }

@@ -1,5 +1,6 @@
 package org.magicat.MIND;
 
+import org.magicat.model.SequenceItem;
 import org.magicat.model.Target;
 
 import java.util.List;
@@ -16,6 +17,8 @@ public interface GeneMIND {
 
     Set<String> getSymbols();
     Set<String> getKinases();
+
+    List<SequenceItem> findSequence(String seq);
 
     List<Target> getTargets();
 

@@ -3,9 +3,12 @@
 # Latest version of curation demonstration frontend
 
 ## RECENT CHANGES:
-Google OAuth2 is currently activated and the /conf/usergoogle endpoint used to transmit the user and TokenId provided by Google
-The LDAP/SAML was deactivated, any current name (e.g. MSK ID) in the MongoDB
-still works (with any password) and the endpoint is now "/intuition", it was never fully 'knowledge' because curators rely on intuition about repeated observations from reading the text as a career, that is/has been the most profitable way to find the functional sentences in the demo frontend.  
+Google OAuth2 is currently activated and the /conf/usergoogle endpoint used to transmit the user email and TokenId provided by Google for validation.
+The LDAP/SAML was deactivated, any current name (e.g. MSK ID) in the MongoDB still works (with any password) and the demo frontend now includes the Google login through LoginModal
+and the endpoint is now "/intuition", it was never fully 'knowledge' because curators rely on intuition about repeated observations from reading the text as a career, that is/has been the most profitable way to find the functional sentences in the demo frontend.  
+
+LATEST TESTS: T2T-CHM13 reference genome Lucene indexing Test1.readFASTA(), this enables search (e.g., fuzzy search) of DNA sequences,
+TestMIND.testSeqSearch() shows a query that looks for sequence on forward and reverse strands.
 
 REQUIRED: The one greatest biggest criteria is on the PDF2HTML (and the other paragraph / structured table + figures endpoint delivered as JSON) for the advanced cases, selling this was never a goal but it's almost like it has to be good enough to ace the edge cases (latest graphs in some PMIDs >~ 33000000 encoded with newer approaches - great for PDF highlighting but bad for sectionalizing the photo/image components) to fully upgrade to the newest pipeline.
 
@@ -98,4 +101,4 @@ https://aimlcoe/knowledge/swagger-ui/
 
 
 
-#### P.P.S. also contains a few AI/ML endpoints for optimizing under limited sampling sizes with randomization tests, just some demos of DL4j with dropout regularization plus reweighting, where the TensorFlow backend can be substituted in or a Keras model written out for Python tensorflow.keras.  It's a survival of the fittest (evolutionary) approach to deep learning networks where the maximum-impact factors are the objective criteria for identification.  Seemed a valid alternative approach to, e.g., boosted trees (xgboost) with limited objective weights strongly dependent on randomization criteria.
+#### P.P.S. also contains a few AI/ML endpoints for optimizing under limited sampling sizes with randomization tests, just some demos of DL4j with dropout regularization plus reweighting, where the TensorFlow backend can be substituted in or a Keras model written out for Python tensorflow.keras.  It's a survival of the fittest (evolutionary) approach to deep learning networks where the maximum-impact factors are the objective criteria for identification.  Seemed a valid alternative approach to, e.g., boosted trees (xgboost) with limited objective weights strongly dependent on randomization criteria.  These are in the montecarlo package and this and the SimulationController (endpoints to launch jobs with GPUs) can be removed.
