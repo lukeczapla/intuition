@@ -35,8 +35,10 @@ export const ProfileData = (props) => {
               Group/PI: {props.user.group}
               {props.user.streetAddress != null ? props.user.streetAddress : null}
             </p>
-            {props.user.contentType != null && props.user.contentType != null && props.user.contentType.startsWith("image") ?
+            {props.user.contentType != null && props.user.contentType.startsWith("image") ?
             <Image style={{height:"20%", border: "1px solid black"}} src={"data:"+props.user.contentType+";base64,"+props.user.image.data} /> : null}
+            {props.user.imageUrl != null && props.user.imageUrl.length > 2 ?
+            <Image style={{height:"20%", border: "1px solid black"}} src={props.user.imageUrl} />: null}
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={props.onHide}>Close</Button>

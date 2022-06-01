@@ -1,8 +1,12 @@
 ## OncoKB tool for curation prototypes and other services
-# Literature Automation Platform + MongoDB + SOLR
+# Literature Automation Platform + MongoDB + Solr
+# Latest version of curation demonstration frontend
 
-RECENT CHANGES: The LDAP/SAML was deactivated, any current name (e.g. MSK ID) in the MongoDB
+## RECENT CHANGES:
+Google OAuth2 is currently activated and the /conf/usergoogle endpoint used to transmit the user and TokenId provided by Google
+The LDAP/SAML was deactivated, any current name (e.g. MSK ID) in the MongoDB
 still works (with any password) and the endpoint is now "/intuition", it was never fully 'knowledge' because curators rely on intuition about repeated observations from reading the text as a career, that is/has been the most profitable way to find the functional sentences in the demo frontend.  
+
 REQUIRED: The one greatest biggest criteria is on the PDF2HTML (and the other paragraph / structured table + figures endpoint delivered as JSON) for the advanced cases, selling this was never a goal but it's almost like it has to be good enough to ace the edge cases (latest graphs in some PMIDs >~ 33000000 encoded with newer approaches - great for PDF highlighting but bad for sectionalizing the photo/image components) to fully upgrade to the newest pipeline.
 
 ## (More details to be added)

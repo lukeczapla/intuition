@@ -40,6 +40,10 @@ public class User {
     private String imageFileName;
     private Binary image;
     private String contentType;
+    private String imageUrl;
+
+    @Transient
+    private String tokenId;
 
     public User() {
 
@@ -168,6 +172,22 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getTokenId() {
+        return tokenId;
+    }
+
+    public void setTokenId(String tokenId) {
+        this.tokenId = tokenId;
     }
 
     @Override

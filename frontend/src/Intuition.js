@@ -294,7 +294,7 @@ const Intuition = (props) => {
     setHasItem(true);
     window.scroll({top:0,behavior:'smooth'});
     if (onLoad) props.onMove(key, getState(), "article/" + data.pmId);
-    setKey('item');
+    setKey("item");
     setItemType(itemtype);
     setItemVariant(variant);
   }
@@ -307,7 +307,7 @@ const Intuition = (props) => {
     setHasItem(true);
     window.scroll({top:0,behavior:'smooth'});
     props.onMove(key, getState(analyzerState), "article/" + data.pmId);
-    setKey('item');
+    setKey("item");
     setItemType(itemtype);
   }
 

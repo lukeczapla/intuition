@@ -1,6 +1,12 @@
 package org.magicat.controller;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import io.swagger.annotations.ApiOperation;
+import org.magicat.config.GoogleProperties;
 import org.magicat.model.User;
 import org.magicat.repository.UserRepository;
 import org.magicat.service.UserDetailsService;
@@ -10,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,20 +27,26 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 @ApiIgnore
 @RestController
 public class UserController {
 
     private final static Logger log = LoggerFactory.getLogger(UserController.class);
+    private static final JsonFactory jacksonFactory = new GsonFactory();
 
     private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
+    private final GoogleProperties googleProperties;
 
     @Autowired
-    public UserController(UserDetailsService userDetailsService, UserRepository userRepository) {
+    public UserController(UserDetailsService userDetailsService, UserRepository userRepository, GoogleProperties googleProperties) {
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
+        this.googleProperties = googleProperties;
     }
 
     @ApiOperation("Check user status")
@@ -116,6 +130,56 @@ public class UserController {
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
+
+    @ApiOperation(value = "Authenticate the provided user", notes = "User information obtained from Google")
+    @RequestMapping(value = "/conf/usergoogle", method = RequestMethod.POST)
+    public ResponseEntity loginGoogle(@RequestBody User user) throws Exception {
+        if (user == null || user.getEmailAddress() == null || user.getTokenId() == null) {
+            return new ResponseEntity("Invalid data", HttpStatus.BAD_REQUEST);
+        }
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), jacksonFactory)
+                .setAudience(Collections.singletonList(googleProperties.getClientId()))
+                .build();
+        log.info("Login Controller: " + user.getEmailAddress() + " " + user.getTokenId().substring(0,5));
+        log.info(user.getTokenId());
+        GoogleIdToken idToken = verifier.verify(user.getTokenId());
+
+        if (idToken == null) {
+            return new ResponseEntity("Invalid token data", HttpStatus.BAD_REQUEST);
+        } else {
+            GoogleIdToken.Payload payload = idToken.getPayload();
+            if (payload == null || !payload.getEmail().equals(user.getEmailAddress())) {
+                return new ResponseEntity("Invalid email address", HttpStatus.BAD_REQUEST);
+            }
+            log.info("Verified account");
+        }
+
+        if (userDetailsService.loadUserByUsername(user.getEmailAddress()) != null) {
+
+            UsernamePasswordAuthenticationToken authrequest = new UsernamePasswordAuthenticationToken(user.getEmailAddress(), null,
+                    userDetailsService.loadUserByUsername(user.getEmailAddress()).getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authrequest);
+
+            return new ResponseEntity("Finished, authenticated", HttpStatus.OK);
+
+        } else {
+            try {
+                userDetailsService.registerNewAccount(user);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new ResponseEntity("Invalid email address", HttpStatus.BAD_REQUEST);
+            }
+
+            Set<GrantedAuthority> grant = new HashSet<>();
+            grant.add(new SimpleGrantedAuthority(user.getRole().toString()));
+            UsernamePasswordAuthenticationToken authrequest = new UsernamePasswordAuthenticationToken(user.getEmailAddress(), null, grant);
+            SecurityContextHolder.getContext().setAuthentication(authrequest);
+            return new ResponseEntity("Created, authenticated", HttpStatus.OK);
+
+        }
+        //return new ResponseEntity("Invalid data", HttpStatus.BAD_REQUEST);
+    }
+
 
 
 }

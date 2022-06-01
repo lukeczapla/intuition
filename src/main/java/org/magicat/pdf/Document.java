@@ -439,6 +439,22 @@ public class Document implements Serializable {
         //StringUtils.getLevenshteinDistance()
     }
 
+    public void processDuplicateImages() {
+        for (int i = 0; i < getPages().size(); i++) {
+            for (ImageItem item1 : imageMap.get(i)) {
+                for (int j = 0; j < getPages().size(); j++) {
+                    if (i == j) continue;
+                    for (ImageItem item2 : imageMap.get(j)) {
+                        if (item1.getByteImage().equals(item2.getByteImage()) || (Math.abs(item1.getTopX() - item2.getTopX()) < 1.0f && Math.abs(item1.getTopY() - item2.getTopY()) < 1.0f && item1.getWidth() == item2.getWidth() && item1.getHeight() == item2.getHeight())) {
+                            item1.setDuplicate(true);
+                            item2.setDuplicate(true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public void annotate() {
         log.info("annotate()");
         Stack stack = new Stack();

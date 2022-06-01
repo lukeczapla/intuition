@@ -37,6 +37,7 @@ import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.magicat.MIND.SimulationMIND;
+import org.magicat.config.ScheduledTasks;
 import org.magicat.controller.ArticleController;
 import org.magicat.controller.VariantController;
 import org.magicat.model.*;
@@ -1769,15 +1770,19 @@ public class Test1 {
 
     @Test
     void readFasta() {
-        String[][] gb2rs = {{"CP068277.2", "NC_060925.1"}, {"CP068276.2", "NC_060926.1"}, {"CP068275.2", "NC_060927.1"}, {"CP068274.2", "NC_060928.1"}, {"CP068273.2", "NC_060929.1"}, {"CP068272.2", "NC_060930.1"}, {"CP068271.2", "NC_060931.1"}, {"CP068270.2", "NC_060932.1"}, {"CP068269.2", "NC_060933.1"}, {"CP068268.2", "NC_060934.1"}, {"CP068267.2", "NC_060935.1"}, {"CP068266.2", "NC_060936.1"}, {"CP068265.2", "NC_060937.1"}, {"CP068264.2", "NC_060938.1"}, {"CP068263.2", "NC_060939.1"}, {"CP068262.2", "NC_060940.1"}, {"CP068261.2", "NC_060941.1"}, {"CP068260.2", "NC_060942.1"}, {"CP068259.2", "NC_060943.1"}, {"CP068258.2", "NC_060944.1"}, {"CP068257.2", "NC_060945.1"}, {"CP068256.2", "NC_060946.1"}, {"CP068255.2", "NC_060947.1"}, {"CP086569.2", "NC_060948.1"}, {"CP068254.1", "na"}};
+        ScheduledTasks.updateArticles = false;
+        solrClientTool.setCollection("t2t");
+        solrClientTool.setReloadRate(30);
+        // 22 chromosomes, x, y, mtDNA
+        String[][] gb2rs = {{"CP068277.2", "NC_060925.1"}, {"CP068276.2", "NC_060926.1"}, {"CP068275.2", "NC_060927.1"}, {"CP068274.2", "NC_060928.1"}, {"CP068273.2", "NC_060929.1"}, {"CP068272.2", "NC_060930.1"}, {"CP068271.2", "NC_060931.1"}, {"CP068270.2", "NC_060932.1"}, {"CP068269.2", "NC_060933.1"}, {"CP068268.2", "NC_060934.1"}, {"CP068267.2", "NC_060935.1"}, {"CP068266.2", "NC_060936.1"}, {"CP068265.2", "NC_060937.1"}, {"CP068264.2", "NC_060938.1"}, {"CP068263.2", "NC_060939.1"}, {"CP068262.2", "NC_060940.1"}, {"CP068261.2", "NC_060941.1"}, {"CP068260.2", "NC_060942.1"}, {"CP068259.2", "NC_060943.1"}, {"CP068258.2", "NC_060944.1"}, {"CP068257.2", "NC_060945.1"}, {"CP068256.2", "NC_060946.1"}, {"CP068255.2", "NC_060947.1"}, {"CP086569.2", "NC_060948.1"}, {"CP068254.1", "NA (mtDNA)"}};
         Map<String, String> GB2RS = new HashMap<>();
         for (String[] pair: gb2rs)
             GB2RS.put(pair[0], pair[1]);
         try (BufferedReader is = new BufferedReader(new FileReader("GCA_009914755.4_T2T-CHM13v2.0_genomic.fna"));) {
-            PrintWriter out = new PrintWriter("letters.txt");
+            //PrintWriter out = new PrintWriter("letters.txt");
             Alphabet alphabet = null;
             RichSequenceIterator it = RichSequence.IOTools.readFastaDNA(is, new SimpleNamespace("knowledge"));
-            int x = 1;
+            int x = 0;
             while (it.hasNext()) {
                 RichSequence rs = it.nextRichSequence();
                 String name = rs.getName();
@@ -1788,10 +1793,39 @@ public class Test1 {
                 //System.out.println(x + ".\tname="+name+"\tversion="+version+"\tt");
                 System.out.println(x + ".  Circular: " + rs.getCircular() + ", Length = " + rs.length() + ", description: " + rs.getDescription() + "   name:" + rs.getName() + "\n\taccession:" + rs.getAccession() + ", GenBank URN:" + rs.getURN() + ", RefSeq:" + refSeq + ", version="+version+", alphabet = " + alphabet.getName());
                 //System.out.println(rs);
-                out.println(x + ". " + rs.seqString());
+                for (int i = 0; i < rs.seqString().length() / 200; i++) {
+                    Map<String, Object> itemMap = new HashMap<>();
+                    itemMap.put("seq", rs.seqString().substring(i*200, Math.min((i+1)*200, rs.seqString().length())));
+                    itemMap.put("position", i*200+1);
+                    itemMap.put("name", name);
+                    itemMap.put("genbank", gb2rs[x][0]);
+                    itemMap.put("refseq", gb2rs[x][1]);
+                    if (x < 22) {
+                        itemMap.put("chromosome", x+1);
+                    }
+                    else if (x == 22) itemMap.put("chromosome", "X");
+                    else if (x == 23) itemMap.put("chromosome", "Y");
+                    else if (x == 24) itemMap.put("chromosome", "mtDNA");
+                    try {
+                        solrClientTool.addItem(itemMap);
+                        if (i*200+100 < rs.seqString().length() && ((i+1)*200 < rs.seqString().length())) {
+                            itemMap.put("seq", rs.seqString().substring(i*200+100, Math.min((i+1)*200+100, rs.seqString().length())));
+                            itemMap.put("position", i*200+101);
+                            solrClientTool.addItem(itemMap);
+                        }
+                    } catch (SolrServerException|IOException e) {
+                        log.error("Error adding item: {}", e.getMessage());
+                    }
+                }
+                try {
+                    solrClientTool.commit();
+                } catch (SolrServerException|IOException e) {
+                    log.error("Error on commit: {}", e.getMessage());
+                }
+                //out.println(x + ". " + rs.seqString());
                 x++;
             }
-            out.close();
+            //out.close();
         } catch (IOException| BioException e) {
             e.printStackTrace();
         }

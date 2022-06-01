@@ -9,6 +9,7 @@ import lombok.Setter;
 import javax.imageio.ImageIO;
 import java.awt.image.RenderedImage;
 import java.io.*;
+import java.util.Arrays;
 
 @Getter
 @Setter
@@ -23,6 +24,7 @@ public class ImageItem implements Serializable {
     private transient RenderedImage image;
     private float topX, topY;
     private int height, width;
+    private boolean duplicate = false;
 
     public ImageItem(RenderedImage image, float topX, float topY) {
         this.image = image;
@@ -64,6 +66,13 @@ public class ImageItem implements Serializable {
         }
     }
 
+    public boolean isDuplicate() {
+        return duplicate;
+    }
+
+    public void setDuplicate(boolean duplicate) {
+        this.duplicate = duplicate;
+    }
 }
 
 @Getter
@@ -76,4 +85,12 @@ class ByteImage implements Serializable {
     private byte[] data;
     private String name;
     private String format;
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof ByteImage)) return false;
+        ByteImage o = (ByteImage)other;
+        return Arrays.equals(data, o.data);
+    }
+
 }

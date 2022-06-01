@@ -58,7 +58,7 @@ public class SolrClientTool {
     private final SolrClient client = cloud ? new CloudSolrClient.Builder(solrCloudURLs).withParallelUpdates(true).build() : new HttpSolrClient.Builder().withBaseSolrUrl(httpUrl).allowCompression(true).build();
 
     private static int count = 0;
-    private final int reloadRate = 15000;
+    private int reloadRate = 15000;
 
     @AllArgsConstructor
     @Getter
@@ -376,12 +376,24 @@ public class SolrClientTool {
         for (String key: baseValues.keySet()) {
             inputDoc.addField(key, baseValues.get(key));
         }
-        for (String key: appendValues.keySet()) {
+        if (appendValues != null) for (String key: appendValues.keySet()) {
             inputDoc.addField(key, appendValues.get(key));
         }
         UpdateResponse response = client.add(collection, inputDoc);
-        client.commit(collection);
+        if (++count % reloadRate == 0) client.commit(collection);
         return response;
+    }
+
+    public UpdateResponse addItem(Map<String, Object> baseValues) throws SolrServerException, IOException {
+        return addItem(null, baseValues, null);
+    }
+
+    public void commit() throws SolrServerException, IOException {
+        client.commit(getCollection());
+    }
+
+    public void commit(String collection) throws SolrServerException, IOException {
+        client.commit(collection);
     }
 
     public UpdateResponse add(String collection, Map<String, List<String>> properties, Map<String, List<String>> append) throws SolrServerException, IOException {
@@ -564,6 +576,14 @@ public class SolrClientTool {
 
     public void setCollection(String collection) {
         this.collection = collection;
+    }
+
+    public int getReloadRate() {
+        return reloadRate;
+    }
+
+    public void setReloadRate(int reloadRate) {
+        this.reloadRate = reloadRate;
     }
 
     public static String escape(String s) {
