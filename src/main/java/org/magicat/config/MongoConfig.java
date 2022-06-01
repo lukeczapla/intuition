@@ -6,7 +6,6 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
@@ -26,7 +25,6 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     private final static boolean overrideConnectionString = ConfigProperties.mongoOverride;
     private final static String mongoUri2 = "mongodb://localhost:27017/pmg_knowledge";
     private final static String databaseName2 = "pmg_knowledge";
-
 
     // pmg_knowledge for Production
     @NotNull
@@ -51,6 +49,7 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
         return MongoClients.create(mongoClientSettings);
     }
 
+    /*
     public MongoClient mongoClient2() {
         ConnectionString connectionString = new ConnectionString(mongoUri2);
         MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
@@ -68,10 +67,11 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
 
         return MongoClients.create(mongoClientSettings);
     }
+*/
 
     @Bean
     public MongoTemplate mongoTemplate() {
-        return new MongoTemplate(overrideConnectionString ? mongoClient3() : mongoClient2(), overrideConnectionString ? getDatabaseName() : databaseName2);
+        return new MongoTemplate(mongoClient(), overrideConnectionString ? getDatabaseName() : databaseName2);
     }
 
     @Override

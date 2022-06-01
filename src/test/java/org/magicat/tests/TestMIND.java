@@ -1,28 +1,13 @@
 package org.magicat.tests;
 
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.common.SolrDocumentList;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.magicat.MIND.GeneMIND;
-import org.magicat.MIND.StructureMIND;
-import org.magicat.model.Target;
-import org.magicat.repository.TargetRepository;
-import org.magicat.util.SolrClientTool;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 public class TestMIND {
-
+/*
     @Autowired
     GeneMIND geneMIND;
     @Autowired
@@ -71,5 +56,5 @@ public class TestMIND {
     public void testAblStructures() {
         structureMIND.analyzeStructures(structureMIND.getStructures());
     }
-
+*/
 }

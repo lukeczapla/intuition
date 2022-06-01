@@ -10,12 +10,11 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "org.magicat")
 //@EnableAutoConfiguration
-@EnableMongoRepositories
+@EnableMongoRepositories(basePackages = "org.magicat.repository")
 @EnableMongoAuditing
 @EnableScheduling
-//@ComponentScan("org.magicat")
 @Import({WebSecurityConfig.class, SwaggerConfig.class})
 public class Startup {
 

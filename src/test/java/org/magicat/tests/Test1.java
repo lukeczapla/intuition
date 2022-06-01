@@ -1,6 +1,7 @@
 package org.magicat.tests;
 
 import au.com.bytecode.opencsv.CSVReader;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -1768,6 +1769,15 @@ public class Test1 {
         System.out.printf("Running hongxin1 took %8.2f seconds\n", durationS);
     }
 
+    public String spacify(String input) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < input.length(); i++) {
+            if (i != 0 && i % 5 == 0) sb.append(" ");
+            sb.append(input.charAt(i));
+        }
+        return sb.toString();
+    }
+
     @Test
     void readFasta() {
         ScheduledTasks.updateArticles = false;
@@ -1776,59 +1786,81 @@ public class Test1 {
         // 22 chromosomes, x, y, mtDNA
         String[][] gb2rs = {{"CP068277.2", "NC_060925.1"}, {"CP068276.2", "NC_060926.1"}, {"CP068275.2", "NC_060927.1"}, {"CP068274.2", "NC_060928.1"}, {"CP068273.2", "NC_060929.1"}, {"CP068272.2", "NC_060930.1"}, {"CP068271.2", "NC_060931.1"}, {"CP068270.2", "NC_060932.1"}, {"CP068269.2", "NC_060933.1"}, {"CP068268.2", "NC_060934.1"}, {"CP068267.2", "NC_060935.1"}, {"CP068266.2", "NC_060936.1"}, {"CP068265.2", "NC_060937.1"}, {"CP068264.2", "NC_060938.1"}, {"CP068263.2", "NC_060939.1"}, {"CP068262.2", "NC_060940.1"}, {"CP068261.2", "NC_060941.1"}, {"CP068260.2", "NC_060942.1"}, {"CP068259.2", "NC_060943.1"}, {"CP068258.2", "NC_060944.1"}, {"CP068257.2", "NC_060945.1"}, {"CP068256.2", "NC_060946.1"}, {"CP068255.2", "NC_060947.1"}, {"CP086569.2", "NC_060948.1"}, {"CP068254.1", "NA (mtDNA)"}};
         Map<String, String> GB2RS = new HashMap<>();
+        Map<String, Object> itemMap = new HashMap<>();
         for (String[] pair: gb2rs)
             GB2RS.put(pair[0], pair[1]);
+
         try (BufferedReader is = new BufferedReader(new FileReader("GCA_009914755.4_T2T-CHM13v2.0_genomic.fna"));) {
             //PrintWriter out = new PrintWriter("letters.txt");
             Alphabet alphabet = null;
             RichSequenceIterator it = RichSequence.IOTools.readFastaDNA(is, new SimpleNamespace("knowledge"));
             int x = 0;
+            List<Map<String, Object>> items = new ArrayList<>();
             while (it.hasNext()) {
                 RichSequence rs = it.nextRichSequence();
                 String name = rs.getName();
                 String refSeq = GB2RS.get(name);
-                String version = rs.getName()+"."+ rs.getVersion();
+                String version = rs.getName() + "." + rs.getVersion();
                 String description = rs.getDescription();
                 alphabet = rs.getAlphabet();
                 //System.out.println(x + ".\tname="+name+"\tversion="+version+"\tt");
-                System.out.println(x + ".  Circular: " + rs.getCircular() + ", Length = " + rs.length() + ", description: " + rs.getDescription() + "   name:" + rs.getName() + "\n\taccession:" + rs.getAccession() + ", GenBank URN:" + rs.getURN() + ", RefSeq:" + refSeq + ", version="+version+", alphabet = " + alphabet.getName());
+                System.out.println(x + ".  Circular: " + rs.getCircular() + ", Length = " + rs.length() + ", description: " + rs.getDescription() + "   name:" + rs.getName() + "\n\taccession:" + rs.getAccession() + ", GenBank URN:" + rs.getURN() + ", RefSeq:" + refSeq + ", version=" + version + ", alphabet = " + alphabet.getName());
                 //System.out.println(rs);
-                for (int i = 0; i < rs.seqString().length() / 200; i++) {
-                    Map<String, Object> itemMap = new HashMap<>();
-                    itemMap.put("seq", rs.seqString().substring(i*200, Math.min((i+1)*200, rs.seqString().length())));
-                    itemMap.put("position", i*200+1);
+                Iterator<String> chunks = Splitter.fixedLength(200).split(rs.seqString()).iterator();
+                Iterator<String> chunks2 = Splitter.fixedLength(200).split(rs.seqString().substring(100)).iterator();
+                int i = 0;
+                while (chunks.hasNext()) {//for (int i = 0; i < rs.seqString().length() / 200; i++) {
+                    log.info("Adding item {} for {} to {}", i, i * 200, (i + 1) * 200);
+                    //itemMap = new HashMap<>();
+                    itemMap.put("seq", spacify(chunks.next()));
+                    itemMap.put("position", i * 200 + 1);
                     itemMap.put("name", name);
                     itemMap.put("genbank", gb2rs[x][0]);
                     itemMap.put("refseq", gb2rs[x][1]);
                     if (x < 22) {
-                        itemMap.put("chromosome", x+1);
-                    }
-                    else if (x == 22) itemMap.put("chromosome", "X");
+                        itemMap.put("chromosome", "Chr " + (x + 1));
+                    } else if (x == 22) itemMap.put("chromosome", "X");
                     else if (x == 23) itemMap.put("chromosome", "Y");
                     else if (x == 24) itemMap.put("chromosome", "mtDNA");
-                    try {
+                    items.add(new HashMap<>(itemMap));
+                    if (chunks2.hasNext()) {
+                        itemMap.put("seq", spacify(chunks2.next()));
+                        itemMap.put("position", i * 200 + 101);
+                        items.add(new HashMap<>(itemMap));
+                        //solrClientTool.addItem(itemMap);
+                    }
+                    i++;
+
+                    /*try {
+                        items.add(itemMap);
                         solrClientTool.addItem(itemMap);
                         if (i*200+100 < rs.seqString().length() && ((i+1)*200 < rs.seqString().length())) {
-                            itemMap.put("seq", rs.seqString().substring(i*200+100, Math.min((i+1)*200+100, rs.seqString().length())));
+                            itemMap.put("seq", spacify(rs.seqString(), i*200+100, Math.min((i+1)*200+100, rs.seqString().length())));
                             itemMap.put("position", i*200+101);
                             solrClientTool.addItem(itemMap);
                         }
                     } catch (SolrServerException|IOException e) {
                         log.error("Error adding item: {}", e.getMessage());
-                    }
+                    }*/
                 }
+
                 try {
+                    log.info("Adding {} items to Solr", items.size());
+                    solrClientTool.addItems(items);
+                    items = new ArrayList<>();
                     solrClientTool.commit();
-                } catch (SolrServerException|IOException e) {
+                } catch (SolrServerException | IOException e) {
                     log.error("Error on commit: {}", e.getMessage());
                 }
                 //out.println(x + ". " + rs.seqString());
                 x++;
+
+                //out.close();
             }
-            //out.close();
-        } catch (IOException| BioException e) {
+        } catch(IOException | BioException e){
             e.printStackTrace();
         }
+
     }
 
 

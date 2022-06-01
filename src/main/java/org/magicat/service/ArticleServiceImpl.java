@@ -238,14 +238,14 @@ public class ArticleServiceImpl implements ArticleService {
 
     private void processQueueItems(List<Article> articleList) {
         if (pmidList.size() == 0) return;
-        Lists.partition(pmidList, 200).forEach(mylist -> {
-            StringBuilder sb = new StringBuilder();
+        Lists.partition(pmidList, 256).forEach(mylist -> {
+            /*StringBuilder sb = new StringBuilder();
             for (int i = 0; i < mylist.size(); i++) {
                 sb.append(mylist.get(i));
                 if (i != mylist.size() - 1) sb.append(",");
-            }
+            }*/
             try {
-                String XMLfile = "pubmed_ids.xml";
+                /*String XMLfile = "pubmed_ids.xml";
                 ProcessUtil.runScript("python3 python/pubmed_ids.py " + sb);
                 if (parser == null) {
                     parser = new XMLParser(XMLfile);
@@ -262,8 +262,8 @@ public class ArticleServiceImpl implements ArticleService {
                     parser.reload(XMLfile);
                 }
                 // changed from regular DFS to DFSFast! 5/3/2022
-                parser.DFSFast(parser.getRoot(), Tree.articleTreeNoCitations(), null);
-                List<Article> articles = articleRepository.findAllByPmIdIn(pmidList);
+                parser.DFSFast(parser.getRoot(), Tree.articleTreeNoCitations(), null);*/
+                List<Article> articles = articleRepository.findAllByPmIdIn(mylist);
                 if (articles.parallelStream().filter(a -> a.getCitation() == null).count() > 0) {
                     articles.parallelStream().filter(a -> a.getCitation() == null).forEach(a -> {
                         if (a.getJournal() != null) {
@@ -280,9 +280,9 @@ public class ArticleServiceImpl implements ArticleService {
                             log.info("Not enough information to set citation (journal + date + volume etc.) record for " + a.getPmId());
                         }
                     });
-                    if (new File(XMLfile).delete()) log.info("Deleted XMLfile");
+                    //if (new File(XMLfile).delete()) log.info("Deleted XMLfile");
                 }
-            } catch (IOException | ParserConfigurationException | SAXException | NoSuchFieldException | IllegalAccessException e) {
+            } catch (Exception e) {
                 log.error(e.getMessage());
             }
         });

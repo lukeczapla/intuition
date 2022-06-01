@@ -364,6 +364,27 @@ public class SolrClientTool {
         return response;
     }
 
+    public UpdateResponse addItems(String collection, List<Map<String, Object>> baseValues) throws SolrServerException, IOException {
+        if (collection == null) collection = this.getCollection();
+        List<SolrInputDocument> inputDocs = new ArrayList<>();
+        for (int i = 0; i < baseValues.size(); i++) {
+            SolrInputDocument inputDoc = new SolrInputDocument();
+            String id = Integer.toHexString(baseValues.get(i).hashCode());
+            inputDoc.addField("id", id);
+            //if (exists(collection, id)) {
+            //    log.error("ID {} already exists in Solr collection", id);
+            //    return null;
+            //}
+            for (String key : baseValues.get(i).keySet()) {
+                inputDoc.addField(key, baseValues.get(i).get(key));
+            }
+            inputDocs.add(inputDoc);
+        }
+        UpdateResponse response = client.add(collection, inputDocs);
+        client.commit(collection);
+        return response;
+    }
+
     public UpdateResponse addItem(String collection, Map<String, Object> baseValues, Map<String, Object> appendValues) throws SolrServerException, IOException {
         if (collection == null) collection = this.getCollection();
         SolrInputDocument inputDoc = new SolrInputDocument();
@@ -386,6 +407,10 @@ public class SolrClientTool {
 
     public UpdateResponse addItem(Map<String, Object> baseValues) throws SolrServerException, IOException {
         return addItem(null, baseValues, null);
+    }
+
+    public UpdateResponse addItems(List<Map<String, Object>> baseValues) throws SolrServerException, IOException {
+        return addItems(null, baseValues);
     }
 
     public void commit() throws SolrServerException, IOException {
