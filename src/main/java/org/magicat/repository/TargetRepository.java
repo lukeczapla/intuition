@@ -6,13 +6,14 @@ import org.jetbrains.annotations.NotNull;
 import org.magicat.model.Target;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.security.access.annotation.Secured;
 
 import java.util.List;
 import java.util.Optional;
 
 @Api(tags = "Target Entities - data on proteins (genes)")
-//@RepositoryRestResource(collectionResourceRel = "targets", path = "targets")
+@RepositoryRestResource(collectionResourceRel = "targets", path = "targets")
 public interface TargetRepository extends MongoRepository<Target, ObjectId> {
 
     List<Target> findAllBySymbol(String symbol);

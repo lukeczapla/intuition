@@ -8,7 +8,7 @@ The LDAP/SAML was deactivated, any current name (e.g. MSK ID) in the MongoDB sti
 and the endpoint is now "/intuition", it was never fully 'knowledge' because curators rely on intuition about repeated observations from reading the text as a career, that is/has been the most profitable way to find the functional sentences in the demo frontend.  
 
 LATEST TESTS: T2T-CHM13 reference genome Lucene indexing Test1.readFASTA(), this enables search (e.g., fuzzy search) of DNA sequences,
-TestMIND.testSeqSearch() shows a query that looks for sequence on forward and reverse strands.
+TestMIND.testSeqSearch() shows an Abl1 query that looks for sequence on forward and reverse strands and locates the Abl1 coding region on Chromosome 9.
 
 REQUIRED: The one greatest biggest criteria is on the PDF2HTML (and the other paragraph / structured table + figures endpoint delivered as JSON) for the advanced cases, selling this was never a goal but it's almost like it has to be good enough to ace the edge cases (latest graphs in some PMIDs >~ 33000000 encoded with newer approaches - great for PDF highlighting but bad for sectionalizing the photo/image components) to fully upgrade to the newest pipeline.
 

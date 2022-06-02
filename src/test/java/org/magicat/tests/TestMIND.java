@@ -39,10 +39,19 @@ public class TestMIND {
 
     @Test
     void testSeqSearch() {
-        List<SequenceItem> sequences = geneMIND.findSequence("atgcgaaagtcga");
+        // Abl1 synthetic construct sequence
+        List<SequenceItem> sequences = geneMIND.findSequence("tcccccaactacgacaagtg");
         if (sequences != null && sequences.size() > 0) for (SequenceItem s: sequences) {
             System.out.println(s.getChromosome() + " : " + s.getSeq());
+            System.out.println(s);
         }
+        /*
+        [Chr 9] : [tctgt gggct gaagg ctgtt ccctg tttcc ttcag ctcta cgtct cctcc gagag ccgct tcaac accct ggccg agttg gttca tcatc attca acggt ggccg acggg ctcat cacca cgctc catta tccag cccca aagcg caaca agccc actgt ctatg gtgtg tcccc caact acgac aagtg ggaga tggaa]
+SequenceItem(id=3da654e, chromosome=[Chr 9], name=[CP068269.2], position=[143067601], genbank=[CP068269.2], refseq=[NC_060933.1], seq=[tctgt gggct gaagg ctgtt ccctg tttcc ttcag ctcta cgtct cctcc gagag ccgct tcaac accct ggccg agttg gttca tcatc attca acggt ggccg acggg ctcat cacca cgctc catta tccag cccca aagcg caaca agccc actgt ctatg gtgtg tcccc caact acgac aagtg ggaga tggaa])
+        [Chr 9] : [ggccg acggg ctcat cacca cgctc catta tccag cccca aagcg caaca agccc actgt ctatg gtgtg tcccc caact acgac aagtg ggaga tggaa cgcac ggaca tcacc atgaa gcaca agctg ggcgg gggcc agtac gggga ggtgt acgag ggcgt gtgga agaaa tacag cctga cggtg gccgt gaaga]
+SequenceItem(id=1ee1177c, chromosome=[Chr 9], name=[CP068269.2], position=[143067701], genbank=[CP068269.2], refseq=[NC_060933.1], seq=[ggccg acggg ctcat cacca cgctc catta tccag cccca aagcg caaca agccc actgt ctatg gtgtg tcccc caact acgac aagtg ggaga tggaa cgcac ggaca tcacc atgaa gcaca agctg ggcgg gggcc agtac gggga ggtgt acgag ggcgt gtgga agaaa tacag cctga cggtg gccgt gaaga])
+
+         */
     }
 
 
