@@ -71,14 +71,14 @@ public class GeneMINDImpl implements GeneMIND, Serializable {
         return targetRepository.findAllByFamily("Kinase").parallelStream().map(Target::getSymbol).collect(Collectors.toCollection(TreeSet::new));
     }
 
-    private String wildcard(String seq, int n) {
+    private String wildcard(String seq, int n, boolean fuzzy) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < seq.length()+n; i++) {
-            if (i != 0 && i % 5 == 0) result.append(" ");
+            if (i != 0 && i % 5 == 0) result.append(fuzzy ? "~1 " : " ");
             if (i < n) result.append("?");
             else result.append(seq.charAt(i-n));
         }
-        if ((seq.length()+n) % 5 != 0) result.append("?".repeat(5 - (seq.length() + n) % 5));
+        if ((seq.length()+n) % 5 != 0) result.append(fuzzy ? "*~1" : "*");
         return result.toString();
     }
 
@@ -95,7 +95,8 @@ public class GeneMINDImpl implements GeneMIND, Serializable {
     }
 
     @Override
-    public List<SequenceItem> findSequence(String seq) {
+    public List<SequenceItem> findSequence(String seq, boolean fuzzy) {
+        if (fuzzy) log.debug("Running fuzzy search to find issues with missing sequences");
         seq = seq.toLowerCase().replace(" ", "");
         SolrClientTool solrClientTool = solrService.getSolrClientTool();
         solrClientTool.setCollection("t2t");
@@ -104,16 +105,14 @@ public class GeneMINDImpl implements GeneMIND, Serializable {
         StringBuilder query = new StringBuilder();
         query.append("{!complexphrase inOrder=true}");
         for (int i = 0; i < 5; i++) {
-            query.append("seq:\"").append(wildcard(seq, i)).append("\" OR ");
+            query.append("seq:\"").append(wildcard(seq, i, fuzzy)).append("\" OR ");
         }
         String cseq = complement(seq);
-        query.append("seq:\"").append(wildcard(cseq,0)).append("\" OR ");
-        query.append("seq:\"").append(wildcard(cseq,1)).append("\" OR ");
-        query.append("seq:\"").append(wildcard(cseq,2)).append("\" OR ");
-        query.append("seq:\"").append(wildcard(cseq,3)).append("\" OR ");
-        query.append("seq:\"").append(wildcard(cseq,4)).append("\"");
+        for (int i = 0; i < 5; i++) {
+            query.append("seq:\"").append(wildcard(cseq,i, fuzzy)).append(i == 4 ? "\"" : "\" OR ");
+        }
         List<SequenceItem> result = null;
-
+        //log.info(query.toString());
         try {
             SolrClientTool.ResultMap results = solrClientTool.find("t2t", query.toString(), true);
             SolrDocumentList sdl = results.getDocs();
@@ -121,7 +120,12 @@ public class GeneMINDImpl implements GeneMIND, Serializable {
             DocumentObjectBinder binder = new DocumentObjectBinder();
             result = binder.getBeans(SequenceItem.class, sdl);
             // if there is only a single result with possible redundant location
-            if (result != null && result.size() > 0 && result.size() <= 2) {
+            if (sdl.size() == 0) {
+                if (fuzzy) log.debug("NO RESULT WITH FUZZY SEARCH ALSO");
+                position = -1L;
+            } else if (result != null && result.size() > 0 /*&& result.size() <= 2*/) {
+                if (result.size() > 2) log.debug("TOO MANY MATCHES, {}", result.size());
+                if (fuzzy) log.debug("Restored issue with missing sequence!");
                 SequenceItem item = result.get(0);
                 String sequence = item.getSeq().get(0).toLowerCase().replace(" ", "");
                 if (sequence.contains(seq)) {
@@ -134,6 +138,8 @@ public class GeneMINDImpl implements GeneMIND, Serializable {
                     if (!reportEnd) position = item.getPosition().get(0) + sequence.indexOf(cseq) + cseq.length();
                     else position = item.getPosition().get(0) + sequence.indexOf(cseq);
                 }
+            } else if (result != null && result.size() > 2 && fuzzy) {
+                log.debug("FUZZY PROBLEM - TOO MANY SEQUENCES FOUND, {}", result.size());
             }
         } catch (SolrServerException|IOException e) {
             log.error("Error searching genome: {}", e.getMessage());

@@ -1817,31 +1817,36 @@ public class Test1 {
                 System.out.print(gene + "\t" + refSeq + "\t\t" + chromosome);
                 System.out.println();
                 List<Target> targets = targetRepository.findAllBySymbol(gene);
-                geneMIND.findSequence(rs.seqString().substring(0, Math.min(50, rs.seqString().length())));
+                geneMIND.findSequence(rs.seqString().substring(0, Math.min(40, rs.seqString().length())), false);
                 if (targets != null && targets.size() > 0) {
                     for (Target target: targets) {
                         target.setRefSeq(refSeq);
-                        target.setStartPosition(geneMIND.getPosition());
+                        target.setChromosome(chromosome);
+                        if (geneMIND.getPosition() != -1L) target.setStartPosition(geneMIND.getPosition());
                         target.setForward(geneMIND.isForward());
                     }
                     geneMIND.setReportEnd(true);
-                    geneMIND.findSequence(rs.seqString().substring(Math.max(0, rs.seqString().length()-50)));
-                    for (Target target: targets) {
-                        target.setEndPosition(geneMIND.getPosition());
-                        System.out.println(target.getSymbol() + " " + target.getForward() + " " + target.getRefSeq() + " " + target.getStartPosition() + "-" + target.getEndPosition());
-
+                    geneMIND.findSequence(rs.seqString().substring(Math.max(0, rs.seqString().length()-40)), false);
+                    if (geneMIND.getPosition() != -1L) { //|| geneMIND.findSequence(rs.seqString().substring(Math.max(0, rs.seqString().length()-90)), true).size() > 0) {
+                        for (Target target : targets) {
+                            target.setEndPosition(geneMIND.getPosition() == -1L ? null : geneMIND.getPosition());
+                            System.out.println(target.getSymbol() + " " + target.getForward() + " " + target.getRefSeq() + " " + target.getStartPosition() + "-" + target.getEndPosition());
+                        }
                     }
-                    //targetRepository.saveAll(targets);
+                    targetRepository.saveAll(targets);
                 } else {
                     Target target = new Target();
                     target.setSymbol(gene);
                     target.setRefSeq(refSeq);
-                    target.setStartPosition(geneMIND.getPosition());
+                    target.setChromosome(chromosome);
+                    if (geneMIND.getPosition() != -1L) target.setStartPosition(geneMIND.getPosition());
                     target.setForward(geneMIND.isForward());
                     geneMIND.setReportEnd(true);
-                    geneMIND.findSequence(rs.seqString().substring(Math.max(0, rs.seqString().length()-80)));
-                    target.setEndPosition(geneMIND.getPosition());
-                    //targetRepository.save(target);
+                    geneMIND.findSequence(rs.seqString().substring(Math.max(0, rs.seqString().length()-40)), false);
+                    if (geneMIND.getPosition() != -1L) {// || geneMIND.findSequence(rs.seqString().substring(Math.max(0, rs.seqString().length()-90)), true).size() > 0) {
+                        target.setEndPosition(geneMIND.getPosition());
+                    }
+                    targetRepository.save(target);
                 }
 
             }

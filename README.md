@@ -3,15 +3,15 @@
 # Latest version of curation demonstration frontend
 
 ## RECENT CHANGES:
-Google OAuth2 is currently activated and the /conf/usergoogle endpoint used to transmit the user email and TokenId provided by Google for validation.
-The LDAP/SAML was deactivated, any current name (e.g. MSK ID) in the MongoDB still works (with any password) and the demo frontend now includes the Google login through LoginModal
-and the endpoint is now "/intuition", it was never fully 'knowledge' because curators rely on intuition about repeated observations from reading the text as a career, that is/has been the most profitable way to find the functional sentences in the demo frontend.  
+Google OAuth2 is activated for authentication and the /conf/usergoogle endpoint used to transmit the user email and TokenId provided by Google for validation.
+The LDAP/SAML was deactivated, any current name (e.g. MSK ID) in the MongoDB still works without credentials and the demo frontend now includes the Google login through LoginModal popup with the Google sign-in button.
+Lastly, the endpoint is now "/intuition", it is true that curators rely on intuition about repeated observations from reading the text as a career, that is/has been the most profitable way to find functional sentences in the demo frontend.
 
 LATEST TESTS: T2T-CHM13v2.0 reference genome Lucene indexing Test1.readFASTA(), this enables search (e.g., fuzzy search for mutations) of DNA sequences,
 TestMIND.testSeqSearch() shows an Abl1 query that looks for sequence on forward and reverse strands and locates the Abl1 coding region on Chromosome 9.
-The related dataset from NCBI has 72,439 genes with gene, mRNA transcript, and amino acid sequence for each gene ("Targets" collection in MongoDB).
+The related dataset from NCBI has 72,439 genes with gene, mRNA transcript, and amino acid sequence for each gene ("Targets" collection in MongoDB contains the chromosome/location data for T2T-CHM13v2.0 dataset).
 
-REQUIRED: The one greatest biggest criteria is on the PDF2HTML (and the other paragraph / structured table + figures endpoint delivered as JSON) for the advanced cases, selling this was never a goal but it's almost like it has to be good enough to ace the edge cases (latest graphs in some PMIDs >~ 33000000 encoded with newer approaches - great for PDF highlighting but bad for sectionalizing the photo/image components) to fully upgrade to the newest pipeline.
+REQUIRED improvements: The one greatest biggest criteria is on the PDF2HTML (and the other paragraph / structured table + figures endpoint delivered as JSON) for the advanced cases, selling this was never a goal but it's almost like it has to be good enough to ace the edge cases (latest graphs in some PMIDs >~ 33000000 encoded with newer approaches - great for PDF highlighting but bad for sectionalizing the photo/image components) to fully upgrade to the newest pipeline.
 
 ## (More details to be added)
 

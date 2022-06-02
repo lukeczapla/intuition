@@ -32,7 +32,7 @@ public class Target {
     private String NCBIGeneURL;
     private Boolean cBioPortal;
 
-    private String refSeq;
+    private String refSeq, chromosome;
     private Long startPosition, endPosition;
     private Boolean forward;
 
@@ -196,6 +196,14 @@ public class Target {
 
     public void setRefSeq(String refSeq) {
         this.refSeq = refSeq;
+    }
+
+    public String getChromosome() {
+        return chromosome;
+    }
+
+    public void setChromosome(String chromosome) {
+        this.chromosome = chromosome;
     }
 
     public Long getStartPosition() {

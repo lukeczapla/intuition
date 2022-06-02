@@ -37,7 +37,7 @@ public class TestMIND {
     @Test
     void testSeqSearch() {
         // Abl1 synthetic construct sequence
-        List<SequenceItem> sequences = geneMIND.findSequence("AGACACCTCTGCCCTCACCATGAGCCTCTGGCAGCCCCTGGTCCTGGTGCTCCTGGTGCTGGGCTGCTGC");//geneMIND.findSequence("tcccccaactacgacaagtg");
+        List<SequenceItem> sequences = geneMIND.findSequence("AGACACCTCTGCCCTCACCATGAGCCTCTGGCAGCCCCTGGTCCTGGTGCTCCTGGTGCTGGGCTGCTGC", true);//geneMIND.findSequence("tcccccaactacgacaagtg");
         Map<String, Map<String, List<String>>> highlightingMap = geneMIND.getHighlightingMap();
         if (sequences != null && sequences.size() == 2 && Math.abs(sequences.get(0).getPosition().get(0)-sequences.get(1).getPosition().get(0)) == 100) {
             if ((sequences.get(0).getPosition().get(0)-1) % 200 != 0) sequences.remove(0);

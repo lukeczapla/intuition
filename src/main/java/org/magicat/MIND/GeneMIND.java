@@ -19,7 +19,7 @@ public interface GeneMIND {
     Set<String> getSymbols();
     Set<String> getKinases();
 
-    List<SequenceItem> findSequence(String seq);
+    List<SequenceItem> findSequence(String seq, boolean fuzzy);
 
     List<Target> getTargets();
     Map<String, Map<String, List<String>>> getHighlightingMap();

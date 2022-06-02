@@ -59,17 +59,7 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
         return MongoClients.create(mongoClientSettings);
     }
 
-    /*
-    public MongoClient mongoClient3() {
-        ConnectionString connectionString = new ConnectionString(mongoUri);
-        MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
-                .applyConnectionString(connectionString)
-                .build();
-
-        return MongoClients.create(mongoClientSettings);
-    }
-*/
-
+    // opposite binding - useful for change stream with two MongoDB databases!  see Test1.java examples
     @Bean
     public MongoTemplate mongoTemplate() {
         return new MongoTemplate(mongoClientUri(overrideConnectionString ? mongoUri : mongoUri2), overrideConnectionString ? getDatabaseName() : databaseName2);
