@@ -49,9 +49,9 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
         return MongoClients.create(mongoClientSettings);
     }
 
-    /*
-    public MongoClient mongoClient2() {
-        ConnectionString connectionString = new ConnectionString(mongoUri2);
+
+    public MongoClient mongoClientUri(String uri) {
+        ConnectionString connectionString = new ConnectionString(uri);
         MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
                 .applyConnectionString(connectionString)
                 .build();
@@ -59,6 +59,7 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
         return MongoClients.create(mongoClientSettings);
     }
 
+    /*
     public MongoClient mongoClient3() {
         ConnectionString connectionString = new ConnectionString(mongoUri);
         MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
@@ -71,7 +72,7 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
 
     @Bean
     public MongoTemplate mongoTemplate() {
-        return new MongoTemplate(mongoClient(), overrideConnectionString ? getDatabaseName() : databaseName2);
+        return new MongoTemplate(mongoClientUri(overrideConnectionString ? mongoUri : mongoUri2), overrideConnectionString ? getDatabaseName() : databaseName2);
     }
 
     @Override

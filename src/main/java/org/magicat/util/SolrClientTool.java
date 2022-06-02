@@ -166,32 +166,28 @@ public class SolrClientTool {
         query.setParam("mm", "100%");
         query.setParam("df", defaultField).setParam("defType", getParser()); // lucene or edismax (or dismax, etc)
         QueryResponse response = client.query(collection, query);
-        /*if (response.getClusteringResponse() != null && response.getClusteringResponse().getClusters() != null) {
-            List<Cluster> clusters = response.getClusteringResponse().getClusters();
-            int item = 1;
-            for (Cluster c : clusters) {
-                log.info("Cluster " + item);
-                log.info(c.toString());
-                log.info(c.getLabels().toString());
-                log.info(c.getDocs().toString());
-                log.info("Subclusters:");
-                int item2 = 1;
-                if (c.getSubclusters() != null) for (Cluster c2 : c.getSubclusters()) {
-                    log.info("Subcluster " + item2);
-                    log.info(c.toString());
-                    log.info(c.getLabels().toString());
-                    log.info(c.getDocs().toString());
-                    item2++;
-                }
-                item++;
-            }
-        }*/
         SolrDocumentList results = response.getResults();
         if (results.size() == 0) {
             log.info("No Solr query results found for {}", queryText);
         }
         return results;
     }
+
+    public ResultMap find(String collection, String queryText, boolean highlight) throws IOException, SolrServerException {
+        if (collection == null) collection = this.getCollection();
+        SolrQuery query = new SolrQuery();
+        query.setQuery(queryText).setStart(0).setRows(10000).setIncludeScore(true);
+        if (highlight) query.setHighlight(true).addHighlightField(defaultField).setHighlightSimplePre("<mark>").setHighlightSimplePost("</mark>").setHighlightFragsize(0);
+        query.setParam("mm", "100%");
+        query.setParam("df", defaultField).setParam("defType", getParser()); // lucene or edismax (or dismax, etc)
+        QueryResponse response = client.query(collection, query);
+        SolrDocumentList results = response.getResults();
+        if (results.size() == 0) {
+            log.info("No Solr query results found for {}", queryText);
+        }
+        return new ResultMap(response.getExplainMap(), results, response.getHighlighting());
+    }
+
 
     public SolrDocumentList find(String collection, String queryText, String fields, int nResults, String freqTerm) throws IOException, SolrServerException {
         if (collection == null) collection = this.getCollection();

@@ -37,6 +37,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.magicat.MIND.GeneMIND;
 import org.magicat.MIND.SimulationMIND;
 import org.magicat.config.ScheduledTasks;
 import org.magicat.controller.ArticleController;
@@ -93,6 +94,8 @@ public class Test1 {
     SolrService solrService;
     @Autowired
     GridFsTemplate gridFsTemplate;
+    @Autowired
+    GeneMIND geneMIND;
 
     @Autowired
     SolrClientTool solrClientTool;
@@ -1779,6 +1782,75 @@ public class Test1 {
     }
 
     @Test
+    void readGenes() {
+        String[][] gb2rs = {{"CP068277.2", "NC_060925.1"}, {"CP068276.2", "NC_060926.1"}, {"CP068275.2", "NC_060927.1"}, {"CP068274.2", "NC_060928.1"}, {"CP068273.2", "NC_060929.1"}, {"CP068272.2", "NC_060930.1"}, {"CP068271.2", "NC_060931.1"}, {"CP068270.2", "NC_060932.1"}, {"CP068269.2", "NC_060933.1"}, {"CP068268.2", "NC_060934.1"}, {"CP068267.2", "NC_060935.1"}, {"CP068266.2", "NC_060936.1"}, {"CP068265.2", "NC_060937.1"}, {"CP068264.2", "NC_060938.1"}, {"CP068263.2", "NC_060939.1"}, {"CP068262.2", "NC_060940.1"}, {"CP068261.2", "NC_060941.1"}, {"CP068260.2", "NC_060942.1"}, {"CP068259.2", "NC_060943.1"}, {"CP068258.2", "NC_060944.1"}, {"CP068257.2", "NC_060945.1"}, {"CP068256.2", "NC_060946.1"}, {"CP068255.2", "NC_060947.1"}, {"CP086569.2", "NC_060948.1"}, {"CP068254.1", "NA (mtDNA)"}};
+        try (BufferedReader is = new BufferedReader(new FileReader("gene.fna"));) {
+            RichSequenceIterator it = RichSequence.IOTools.readFastaDNA(is, new SimpleNamespace("knowledge"));
+            while (it.hasNext()) {
+                RichSequence rs = it.nextRichSequence();
+                String refSeq = rs.getName().split(":")[0];
+                String gene = rs.getDescription().split(" ")[0];
+                /*
+                int chromosome = -1;
+                String chromosomeName = "Unknown";
+                for (int i = 0; i < gb2rs.length; i++) {
+                    if (refSeq.equals(gb2rs[i][1])) {
+                        chromosome = i;
+                        if (i < 22) chromosomeName = "Chr " + (i+1);
+                        else if (i == 22) chromosomeName = "X";
+                        else if (i == 23) chromosomeName = "Y";
+                        else chromosomeName = "mtDNA";
+                        break;
+                    }
+                }
+                if (chromosome == -1) {
+                    log.error("Could not identify chromosome name for gene {} refseq {}", gene, refSeq);
+                    return;
+                }*/
+                String chromosome = rs.getDescription().substring(rs.getDescription().lastIndexOf("=")+1, rs.getDescription().lastIndexOf("]"));
+                if (StringUtils.isNumeric(chromosome)) {
+                    int chromosomeNumber = Integer.parseInt(chromosome);
+                    refSeq = gb2rs[chromosomeNumber-1][1];
+                    chromosome = "Chr " + chromosome;
+                }
+
+                System.out.print(gene + "\t" + refSeq + "\t\t" + chromosome);
+                System.out.println();
+                List<Target> targets = targetRepository.findAllBySymbol(gene);
+                geneMIND.findSequence(rs.seqString().substring(0, Math.min(50, rs.seqString().length())));
+                if (targets != null && targets.size() > 0) {
+                    for (Target target: targets) {
+                        target.setRefSeq(refSeq);
+                        target.setStartPosition(geneMIND.getPosition());
+                        target.setForward(geneMIND.isForward());
+                    }
+                    geneMIND.setReportEnd(true);
+                    geneMIND.findSequence(rs.seqString().substring(Math.max(0, rs.seqString().length()-50)));
+                    for (Target target: targets) {
+                        target.setEndPosition(geneMIND.getPosition());
+                        System.out.println(target.getSymbol() + " " + target.getForward() + " " + target.getRefSeq() + " " + target.getStartPosition() + "-" + target.getEndPosition());
+
+                    }
+                    //targetRepository.saveAll(targets);
+                } else {
+                    Target target = new Target();
+                    target.setSymbol(gene);
+                    target.setRefSeq(refSeq);
+                    target.setStartPosition(geneMIND.getPosition());
+                    target.setForward(geneMIND.isForward());
+                    geneMIND.setReportEnd(true);
+                    geneMIND.findSequence(rs.seqString().substring(Math.max(0, rs.seqString().length()-80)));
+                    target.setEndPosition(geneMIND.getPosition());
+                    //targetRepository.save(target);
+                }
+
+            }
+        } catch (IOException|BioException e) {
+            log.error("Error with gene.fna FASTA: {}", e.getMessage());
+        }
+    }
+
+    @Test
     void readFasta() {
         ScheduledTasks.updateArticles = false;
         solrClientTool.setCollection("t2t");
@@ -1809,7 +1881,7 @@ public class Test1 {
                 Iterator<String> chunks = Splitter.fixedLength(200).split(rs.seqString()).iterator();
                 Iterator<String> chunks2 = Splitter.fixedLength(200).split(rs.seqString().substring(100)).iterator();
                 int i = 0;
-                while (chunks.hasNext()) {//for (int i = 0; i < rs.seqString().length() / 200; i++) {
+                while (chunks.hasNext()) {
                     log.info("Adding item {} for {} to {}", i, i * 200, (i + 1) * 200);
                     //itemMap = new HashMap<>();
                     itemMap.put("seq", spacify(chunks.next()));
@@ -1824,10 +1896,13 @@ public class Test1 {
                     else if (x == 24) itemMap.put("chromosome", "mtDNA");
                     items.add(new HashMap<>(itemMap));
                     if (chunks2.hasNext()) {
+                        log.info("Adding item {} for {} to {}", i, i*200+101, (i+1)*200+101);
                         itemMap.put("seq", spacify(chunks2.next()));
                         itemMap.put("position", i * 200 + 101);
                         items.add(new HashMap<>(itemMap));
                         //solrClientTool.addItem(itemMap);
+                    } else {
+                        log.info("Out of chunks in chunk2 at {}", i*200+101);
                     }
                     i++;
 

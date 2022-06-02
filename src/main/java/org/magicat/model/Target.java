@@ -32,6 +32,10 @@ public class Target {
     private String NCBIGeneURL;
     private Boolean cBioPortal;
 
+    private String refSeq;
+    private Long startPosition, endPosition;
+    private Boolean forward;
+
     private Integer monoclonalCount, polyclonalCount, polyclonalAntigenPurifiedCount, recombinantCount, otherCount;
 
     public ObjectId getId() {
@@ -184,6 +188,38 @@ public class Target {
 
     public void setOtherCount(Integer otherCount) {
         this.otherCount = otherCount;
+    }
+
+    public String getRefSeq() {
+        return refSeq;
+    }
+
+    public void setRefSeq(String refSeq) {
+        this.refSeq = refSeq;
+    }
+
+    public Long getStartPosition() {
+        return startPosition;
+    }
+
+    public void setStartPosition(Long startPosition) {
+        this.startPosition = startPosition;
+    }
+
+    public Long getEndPosition() {
+        return endPosition;
+    }
+
+    public void setEndPosition(Long endPosition) {
+        this.endPosition = endPosition;
+    }
+
+    public Boolean getForward() {
+        return forward;
+    }
+
+    public void setForward(Boolean forward) {
+        this.forward = forward;
     }
 
     public String toString() {

@@ -39,8 +39,12 @@ public class GeneMINDImpl implements GeneMIND, Serializable {
     transient private final SolrService solrService;
     transient private final TextService textService;
 
+    private boolean forward = true, reportEnd = false;
+    private Long position = 0L;
+
     private final List<Target> targetsSorted = new ArrayList<>();  // sorted by symbol
     private Set<String> symbols = null;
+    private Map<String, Map<String, List<String>>> highlightingMap;
     private final Map<String, List<String>> synonyms = new HashMap<>();
 
     @Autowired
@@ -92,9 +96,11 @@ public class GeneMINDImpl implements GeneMIND, Serializable {
 
     @Override
     public List<SequenceItem> findSequence(String seq) {
+        seq = seq.toLowerCase().replace(" ", "");
         SolrClientTool solrClientTool = solrService.getSolrClientTool();
         solrClientTool.setCollection("t2t");
         solrClientTool.setParser("lucene");
+        solrClientTool.setDefaultField("seq");
         StringBuilder query = new StringBuilder();
         query.append("{!complexphrase inOrder=true}");
         for (int i = 0; i < 5; i++) {
@@ -106,15 +112,33 @@ public class GeneMINDImpl implements GeneMIND, Serializable {
         query.append("seq:\"").append(wildcard(cseq,2)).append("\" OR ");
         query.append("seq:\"").append(wildcard(cseq,3)).append("\" OR ");
         query.append("seq:\"").append(wildcard(cseq,4)).append("\"");
+        List<SequenceItem> result = null;
 
         try {
-            SolrDocumentList sdl = solrClientTool.find("t2t", query.toString());
+            SolrClientTool.ResultMap results = solrClientTool.find("t2t", query.toString(), true);
+            SolrDocumentList sdl = results.getDocs();
+            highlightingMap = results.getHighlightingMap();
             DocumentObjectBinder binder = new DocumentObjectBinder();
-            return binder.getBeans(SequenceItem.class, sdl);
+            result = binder.getBeans(SequenceItem.class, sdl);
+            // if there is only a single result with possible redundant location
+            if (result != null && result.size() > 0 && result.size() <= 2) {
+                SequenceItem item = result.get(0);
+                String sequence = item.getSeq().get(0).toLowerCase().replace(" ", "");
+                if (sequence.contains(seq)) {
+                    forward = true;
+                    if (!reportEnd) position = item.getPosition().get(0) + sequence.indexOf(seq);
+                    else position = item.getPosition().get(0) + sequence.indexOf(seq) + seq.length();
+                }
+                if (sequence.contains(cseq)) {
+                    forward = false;
+                    if (!reportEnd) position = item.getPosition().get(0) + sequence.indexOf(cseq) + cseq.length();
+                    else position = item.getPosition().get(0) + sequence.indexOf(cseq);
+                }
+            }
         } catch (SolrServerException|IOException e) {
             log.error("Error searching genome: {}", e.getMessage());
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -127,6 +151,32 @@ public class GeneMINDImpl implements GeneMIND, Serializable {
     public List<Target> getTargets() {
         if (targetsSorted.size() == 0) load();
         return targetsSorted;
+    }
+
+    @Override
+    public Map<String, Map<String, List<String>>> getHighlightingMap() {
+        return highlightingMap;
+    }
+
+    public void setHighlightingMap(Map<String, Map<String, List<String>>> highlightingMap) {
+        this.highlightingMap = highlightingMap;
+    }
+
+    public boolean isForward() {
+        return forward;
+    }
+
+    public Long getPosition() {
+        return position;
+    }
+
+
+    public boolean isReportEnd() {
+        return reportEnd;
+    }
+
+    public void setReportEnd(boolean reportEnd) {
+        this.reportEnd = reportEnd;
     }
 
     @Override

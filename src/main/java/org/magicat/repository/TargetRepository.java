@@ -24,7 +24,7 @@ public interface TargetRepository extends MongoRepository<Target, ObjectId> {
     List<Target> findByNameRegex(String regex);
 
     @NotNull
-    @Secured("ROLE_ADMIN")
+    //@Secured("ROLE_ADMIN")
     @Override
     <S extends Target> List<S> saveAll(@NotNull Iterable<S> entities);
 

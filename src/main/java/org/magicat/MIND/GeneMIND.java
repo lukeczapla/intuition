@@ -4,6 +4,7 @@ import org.magicat.model.SequenceItem;
 import org.magicat.model.Target;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -21,7 +22,12 @@ public interface GeneMIND {
     List<SequenceItem> findSequence(String seq);
 
     List<Target> getTargets();
+    Map<String, Map<String, List<String>>> getHighlightingMap();
 
     void findNewAlterations();
+
+    boolean isForward();
+    Long getPosition();
+    void setReportEnd(boolean reportEnd);
 
 }

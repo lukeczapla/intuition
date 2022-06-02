@@ -24,7 +24,7 @@ public class SequenceItem {
     private List<String> name;
 
     @Field("position")
-    private List<Integer> position;
+    private List<Long> position;
 
     @Field("genbank")
     private List<String> genbank;
@@ -63,11 +63,11 @@ public class SequenceItem {
         this.name = name;
     }
 
-    public List<Integer> getPosition() {
+    public List<Long> getPosition() {
         return position;
     }
 
-    public void setPosition(List<Integer> position) {
+    public void setPosition(List<Long> position) {
         this.position = position;
     }
 

@@ -15,10 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ExtendWith(SpringExtension.class)
@@ -40,10 +37,21 @@ public class TestMIND {
     @Test
     void testSeqSearch() {
         // Abl1 synthetic construct sequence
-        List<SequenceItem> sequences = geneMIND.findSequence("tcccccaactacgacaagtg");
+        List<SequenceItem> sequences = geneMIND.findSequence("AGACACCTCTGCCCTCACCATGAGCCTCTGGCAGCCCCTGGTCCTGGTGCTCCTGGTGCTGGGCTGCTGC");//geneMIND.findSequence("tcccccaactacgacaagtg");
+        Map<String, Map<String, List<String>>> highlightingMap = geneMIND.getHighlightingMap();
+        if (sequences != null && sequences.size() == 2 && Math.abs(sequences.get(0).getPosition().get(0)-sequences.get(1).getPosition().get(0)) == 100) {
+            if ((sequences.get(0).getPosition().get(0)-1) % 200 != 0) sequences.remove(0);
+            else sequences.remove(1);
+        }
         if (sequences != null && sequences.size() > 0) for (SequenceItem s: sequences) {
             System.out.println(s.getChromosome() + " : " + s.getSeq());
             System.out.println(s);
+            if (geneMIND.isForward()) System.out.println("Forward strand at position " + geneMIND.getPosition());
+            else System.out.println("Reverse strand starting at position " + geneMIND.getPosition());
+            //System.out.println(highlightingMap);
+            if (highlightingMap.get(s.getId()) != null) for (String str: highlightingMap.get(s.getId()).keySet()) {
+                System.out.println(highlightingMap.get(s.getId()).get(str));
+            }
         }
         /*
         [Chr 9] : [tctgt gggct gaagg ctgtt ccctg tttcc ttcag ctcta cgtct cctcc gagag ccgct tcaac accct ggccg agttg gttca tcatc attca acggt ggccg acggg ctcat cacca cgctc catta tccag cccca aagcg caaca agccc actgt ctatg gtgtg tcccc caact acgac aagtg ggaga tggaa]
