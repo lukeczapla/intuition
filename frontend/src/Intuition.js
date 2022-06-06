@@ -246,9 +246,9 @@ const Intuition = (props) => {
       if (data.endsWith("mskcc.org")) {
         setAuthenticated(true);
         setUserName(data);
-      } else {
-        setAuthenticated(false);
-        setUserName(null);
+      } else if (data.endsWith("google.com")) {
+        setAuthenticated(true);
+        setUserName(data);
       }
     });
     fetch(endpoint + "/conf/user/me")
@@ -264,7 +264,7 @@ const Intuition = (props) => {
     //checkAuthentication();
     //setFlashGene(flashGene+1);
     //setFlashArticle(flashArticle+1);
-    setFlashAnalyzer(flashAnalyzer+1);
+    setFlashAnalyzer(flashAnalyzer => flashAnalyzer+1);
     fetch(endpoint + "/conf/user/me")
         .then(response => response.json())
         .then(data => {
@@ -331,6 +331,12 @@ const Intuition = (props) => {
   }
 
   const handleLogout = () => {
+    const auth2 = window.gapi.auth2.getAuthInstance();
+    if (auth2 != null) {
+      auth2.signOut().then(
+          auth2.disconnect().then({})
+    )
+    }
     fetch(endpoint + "/logout")
     .then(() => {
       setAuthenticated(false);

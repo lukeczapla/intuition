@@ -23,7 +23,7 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     private final static String databaseName = "pmg_knowledge";
 
     private final static boolean overrideConnectionString = ConfigProperties.mongoOverride;
-    private final static String mongoUri2 = "mongodb://localhost:27017/pmg_knowledge";
+    private final static String mongoUri2 = "mongodb://192.168.1.86:27017/pmg_knowledge";
     private final static String databaseName2 = "pmg_knowledge";
 
     // pmg_knowledge for Production

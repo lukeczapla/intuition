@@ -16,6 +16,7 @@ import com.mongodb.client.model.changestream.OperationType;
 import com.mongodb.client.model.changestream.UpdateDescription;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -37,8 +38,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.magicat.MIND.GeneMIND;
 import org.magicat.MIND.SimulationMIND;
+import org.magicat.MIND.GeneMIND;
 import org.magicat.config.ScheduledTasks;
 import org.magicat.controller.ArticleController;
 import org.magicat.controller.VariantController;
@@ -1781,13 +1782,52 @@ public class Test1 {
         return sb.toString();
     }
 
+    private String complement(String seq) {
+        StringBuilder result = new StringBuilder();
+        for (int i = seq.length()-1; i >= 0; i--) {
+            if (Character.toLowerCase(seq.charAt(i)) == 'a') result.append("t");
+            else if (Character.toLowerCase(seq.charAt(i)) == 't') result.append("a");
+            else if (Character.toLowerCase(seq.charAt(i)) == 'g') result.append("c");
+            else if (Character.toLowerCase(seq.charAt(i)) == 'c') result.append("g");
+            else result.append("?");
+        }
+        return result.toString();
+    }
+
+    @Test
+    void testGene1() throws SolrServerException, IOException {
+        List<Target> targets = targetRepository.findAllBySymbol("TP53");
+        Target p53 = targets.get(0);
+        System.out.println(p53.getStartPosition() + " - " + p53.getEndPosition() + " " + (p53.getForward() ? "forward":"reverse"));
+        System.out.println(p53.getChromosome());
+        solrClientTool.setCollection("t2t");
+        SolrDocumentList sdl = solrClientTool.find("t2t", "position:["+((p53.getStartPosition()/200)*200+1) + " TO " + ((p53.getEndPosition()/200)*200+1) + "] AND chromosome:\""+p53.getChromosome()+"\"");
+        System.out.println(sdl.get(0));
+        DocumentObjectBinder binder = new DocumentObjectBinder();
+        List<SequenceItem> result = binder.getBeans(SequenceItem.class, sdl);
+        StringBuilder res = new StringBuilder();
+        for (SequenceItem item : result) {
+            if ((item.getPosition().get(0) - 1L) % 200L != 0L) continue;
+            String sequence = item.getSeq().get(0).replace(" ", "");
+            System.out.println(item.getPosition().get(0));
+            if (item.getPosition().get(0)+200L > p53.getEndPosition()) res.append(sequence, 0, p53.getEndPosition().intValue()-item.getPosition().get(0).intValue());
+            else if (item.getPosition().get(0) < p53.getStartPosition()) res.append(sequence.substring(p53.getStartPosition().intValue() - item.getPosition().get(0).intValue()));
+            else res.append(item.getSeq().get(0).replace(" ", ""));
+        }
+        System.out.println(complement(res.toString()));
+        System.out.println(res.toString().length());
+    }
+
     @Test
     void readGenes() {
         String[][] gb2rs = {{"CP068277.2", "NC_060925.1"}, {"CP068276.2", "NC_060926.1"}, {"CP068275.2", "NC_060927.1"}, {"CP068274.2", "NC_060928.1"}, {"CP068273.2", "NC_060929.1"}, {"CP068272.2", "NC_060930.1"}, {"CP068271.2", "NC_060931.1"}, {"CP068270.2", "NC_060932.1"}, {"CP068269.2", "NC_060933.1"}, {"CP068268.2", "NC_060934.1"}, {"CP068267.2", "NC_060935.1"}, {"CP068266.2", "NC_060936.1"}, {"CP068265.2", "NC_060937.1"}, {"CP068264.2", "NC_060938.1"}, {"CP068263.2", "NC_060939.1"}, {"CP068262.2", "NC_060940.1"}, {"CP068261.2", "NC_060941.1"}, {"CP068260.2", "NC_060942.1"}, {"CP068259.2", "NC_060943.1"}, {"CP068258.2", "NC_060944.1"}, {"CP068257.2", "NC_060945.1"}, {"CP068256.2", "NC_060946.1"}, {"CP068255.2", "NC_060947.1"}, {"CP086569.2", "NC_060948.1"}, {"CP068254.1", "NA (mtDNA)"}};
+        int count = 0;
         try (BufferedReader is = new BufferedReader(new FileReader("gene.fna"));) {
             RichSequenceIterator it = RichSequence.IOTools.readFastaDNA(is, new SimpleNamespace("knowledge"));
             while (it.hasNext()) {
                 RichSequence rs = it.nextRichSequence();
+                //count++;
+                //if (count < 70000) continue;
                 String refSeq = rs.getName().split(":")[0];
                 String gene = rs.getDescription().split(" ")[0];
                 /*
@@ -1814,41 +1854,33 @@ public class Test1 {
                     chromosome = "Chr " + chromosome;
                 }
 
-                System.out.print(gene + "\t" + refSeq + "\t\t" + chromosome);
+                System.out.print(count++ + " : " + gene + "\t" + refSeq + "\t\t" + chromosome);
                 System.out.println();
                 List<Target> targets = targetRepository.findAllBySymbol(gene);
-                geneMIND.findSequence(rs.seqString().substring(0, Math.min(40, rs.seqString().length())), false);
+                //geneMIND.setReportEnd(false);
+                //geneMIND.findSequence(rs.seqString().substring(0, Math.min(50, rs.seqString().length())), false);
+                org.magicat.MIND.GeneMIND.GeneResult gr = geneMIND.findGene(rs.seqString().substring(0, Math.min(60, rs.seqString().length())), rs.seqString().substring(Math.max(50, rs.seqString().length()-50)));
                 if (targets != null && targets.size() > 0) {
                     for (Target target: targets) {
                         target.setRefSeq(refSeq);
-                        target.setChromosome(chromosome);
-                        if (geneMIND.getPosition() != -1L) target.setStartPosition(geneMIND.getPosition());
-                        target.setForward(geneMIND.isForward());
+                        target.setChromosome(gr.getChromosome());
+                        if (gr != null && gr.getStartPosition() > 0) target.setStartPosition((long)gr.getStartPosition());
+                        target.setForward(gr.isForward());
+                        target.setEndPosition((long)gr.getEndPosition());
                     }
-                    geneMIND.setReportEnd(true);
-                    geneMIND.findSequence(rs.seqString().substring(Math.max(0, rs.seqString().length()-40)), false);
-                    if (geneMIND.getPosition() != -1L) { //|| geneMIND.findSequence(rs.seqString().substring(Math.max(0, rs.seqString().length()-90)), true).size() > 0) {
-                        for (Target target : targets) {
-                            target.setEndPosition(geneMIND.getPosition() == -1L ? null : geneMIND.getPosition());
-                            System.out.println(target.getSymbol() + " " + target.getForward() + " " + target.getRefSeq() + " " + target.getStartPosition() + "-" + target.getEndPosition());
-                        }
-                    }
+                    Target target = targets.get(0);
+                    System.out.println(target.getSymbol() + " " + target.getForward() + " " + target.getRefSeq() + " " + target.getStartPosition() + "-" + target.getEndPosition());
                     targetRepository.saveAll(targets);
                 } else {
                     Target target = new Target();
                     target.setSymbol(gene);
                     target.setRefSeq(refSeq);
                     target.setChromosome(chromosome);
-                    if (geneMIND.getPosition() != -1L) target.setStartPosition(geneMIND.getPosition());
-                    target.setForward(geneMIND.isForward());
-                    geneMIND.setReportEnd(true);
-                    geneMIND.findSequence(rs.seqString().substring(Math.max(0, rs.seqString().length()-40)), false);
-                    if (geneMIND.getPosition() != -1L) {// || geneMIND.findSequence(rs.seqString().substring(Math.max(0, rs.seqString().length()-90)), true).size() > 0) {
-                        target.setEndPosition(geneMIND.getPosition());
-                    }
+                    if (gr != null && gr.getStartPosition() > 0) target.setStartPosition((long)gr.getStartPosition());
+                    target.setForward(gr.isForward());
+                    target.setEndPosition((long)gr.getEndPosition());
                     targetRepository.save(target);
                 }
-
             }
         } catch (IOException|BioException e) {
             log.error("Error with gene.fna FASTA: {}", e.getMessage());

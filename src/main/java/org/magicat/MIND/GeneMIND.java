@@ -1,5 +1,9 @@
 package org.magicat.MIND;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.magicat.model.SequenceItem;
 import org.magicat.model.Target;
 
@@ -7,11 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * The MIND folder and GeneMIND interface and implementation class rely on large amounts of memory and serialization to work
- * on HPC and other computers with large memory totals (e.g. 256 GB RAM) and serialization of the results onto disk for reloading
- * the system.  GeneMIND only has 19648 genes and is one of the smallest of the MIND package.
- */
+
 public interface GeneMIND {
 
     GeneMIND load();
@@ -20,6 +20,18 @@ public interface GeneMIND {
     Set<String> getKinases();
 
     List<SequenceItem> findSequence(String seq, boolean fuzzy);
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Setter
+    class GeneResult {
+        private int startPosition, endPosition;
+        private boolean forward;
+        private String chromosome;
+    }
+
+    GeneResult findGene(String startSeq, String endSeq);
 
     List<Target> getTargets();
     Map<String, Map<String, List<String>>> getHighlightingMap();

@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 public class GeneMINDImpl implements GeneMIND, Serializable {
 
     @Serial
-    private static final long serialVersionUID = 1234567890L;
+    private static final long serialVersionUID = 123234567890L;
     private static final Logger log = LoggerFactory.getLogger(GeneMIND.class);
 
     private final String regex_missense_ws = "/[\\(\\[]{0,1}[ACDEFGHIKLMNPQRSTVWY][1-9][0-9]{1,4}[ACDEFGHIKLMNPQRSTVWY][\\)\\]\\,]{0,1}/";
@@ -92,6 +92,94 @@ public class GeneMINDImpl implements GeneMIND, Serializable {
             else result.append("?");
         }
         return result.toString();
+    }
+
+    @Override
+    public org.magicat.MIND.GeneMIND.GeneResult findGene(String startSeq, String endSeq) {
+        org.magicat.MIND.GeneMIND.GeneResult gr = new GeneMIND.GeneResult();
+        startSeq = startSeq.toLowerCase().replace(" ", "");
+        endSeq = endSeq.toLowerCase().replace(" ", "");
+        SolrClientTool solrClientTool = solrService.getSolrClientTool();
+        solrClientTool.setCollection("t2t");
+        solrClientTool.setParser("lucene");
+        solrClientTool.setDefaultField("seq");
+        StringBuilder query = new StringBuilder();
+        for (int i = 0; i < 5; i++) {
+            query.append("seq:\"").append(wildcard(startSeq, i, false)).append(i == 4 ? "\"": "\" OR ");
+        }
+        try {
+            SolrClientTool.ResultMap results = solrClientTool.find("t2t", query.toString(), true);
+            SolrDocumentList sdl = results.getDocs();
+            if (sdl.size() == 0) {
+                query = new StringBuilder();
+                String cseq = complement(startSeq);
+                for (int i = 0; i < 5; i++) {
+                    query.append("seq:\"").append(wildcard(cseq,i, false)).append(i == 4 ? "\"" : "\" OR ");
+                }
+                results = solrClientTool.find("t2t", query.toString(), true);
+                sdl = results.getDocs();
+                if (sdl.size() == 0) {
+                    log.error("Neither forward nor reverse sequence found");
+                    return null;
+                }
+                DocumentObjectBinder binder = new DocumentObjectBinder();
+                List<SequenceItem> result = binder.getBeans(SequenceItem.class, sdl);
+                SequenceItem item = result.get(0);
+                String sequence = item.getSeq().get(0).toLowerCase().replace(" ", "");
+                if (sequence.contains(cseq)) {
+                    gr.setStartPosition(item.getPosition().get(0).intValue() + sequence.indexOf(cseq) + cseq.length() - 1);
+                }
+                query = new StringBuilder();
+                cseq = complement(endSeq);
+                for (int i = 0; i < 5; i++) {
+                    query.append("seq:\"").append(wildcard(cseq,i, false)).append(i == 4 ? "\"" : "\" OR ");
+                }
+                results = solrClientTool.find("t2t", query.toString(), true);
+                sdl = results.getDocs();
+                if (sdl.size() == 0) {
+                    log.error("Neither forward nor reverse sequence found");
+                    return null;
+                }
+                binder = new DocumentObjectBinder();
+                result = binder.getBeans(SequenceItem.class, sdl);
+                item = result.get(0);
+                sequence = item.getSeq().get(0).toLowerCase().replace(" ", "");
+                if (sequence.contains(cseq)) {
+                    gr.setEndPosition(item.getPosition().get(0).intValue() + sequence.indexOf(cseq));
+                }
+                gr.setChromosome(item.getChromosome().get(0));
+                gr.setForward(false);
+            } else {
+                DocumentObjectBinder binder = new DocumentObjectBinder();
+                List<SequenceItem> result = binder.getBeans(SequenceItem.class, sdl);
+                SequenceItem item = result.get(0);
+                String sequence = item.getSeq().get(0).toLowerCase().replace(" ", "");
+                if (sequence.contains(startSeq)) {
+                    gr.setStartPosition(item.getPosition().get(0).intValue() + sequence.indexOf(startSeq));
+                }
+                for (int i = 0; i < 5; i++) {
+                    query.append("seq:\"").append(wildcard(endSeq,i, false)).append(i == 4 ? "\"" : "\" OR ");
+                }
+                results = solrClientTool.find("t2t", query.toString(), true);
+                sdl = results.getDocs();
+                if (sdl.size() == 0) {
+                    log.error("Neither forward nor reverse sequence found");
+                    return null;
+                }
+                binder = new DocumentObjectBinder();
+                result = binder.getBeans(SequenceItem.class, sdl);
+                item = result.get(0);
+                sequence = item.getSeq().get(0).toLowerCase().replace(" ", "");
+                if (sequence.contains(endSeq)) {
+                    gr.setEndPosition(item.getPosition().get(0).intValue() + sequence.indexOf(endSeq) + endSeq.length() - 1);
+                }
+                gr.setChromosome(item.getChromosome().get(0));
+                gr.setForward(true);
+            }
+        } catch (SolrServerException|IOException e) {
+            log.error("ERROR IN FINDGENE: {}", e.getMessage());
+        }
+        return gr;
     }
 
     @Override
