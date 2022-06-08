@@ -104,22 +104,23 @@ public class GeneMINDImpl implements GeneMIND, Serializable {
         solrClientTool.setParser("lucene");
         solrClientTool.setDefaultField("seq");
         StringBuilder query = new StringBuilder();
+        query.append("{!complexphrase inOrder=true}");
+
         for (int i = 0; i < 5; i++) {
             query.append("seq:\"").append(wildcard(startSeq, i, false)).append(i == 4 ? "\"": "\" OR ");
         }
         try {
-            SolrClientTool.ResultMap results = solrClientTool.find("t2t", query.toString(), true);
-            SolrDocumentList sdl = results.getDocs();
+            SolrDocumentList sdl = solrClientTool.find("t2t", query.toString());
             if (sdl.size() == 0) {
                 query = new StringBuilder();
                 String cseq = complement(startSeq);
+                query.append("{!complexphrase inOrder=true}");
                 for (int i = 0; i < 5; i++) {
                     query.append("seq:\"").append(wildcard(cseq,i, false)).append(i == 4 ? "\"" : "\" OR ");
                 }
-                results = solrClientTool.find("t2t", query.toString(), true);
-                sdl = results.getDocs();
+                sdl = solrClientTool.find("t2t", query.toString());
                 if (sdl.size() == 0) {
-                    log.error("Neither forward nor reverse sequence found");
+                    log.error("Neither forward nor reverse starting sequence found");
                     return null;
                 }
                 DocumentObjectBinder binder = new DocumentObjectBinder();
@@ -130,14 +131,15 @@ public class GeneMINDImpl implements GeneMIND, Serializable {
                     gr.setStartPosition(item.getPosition().get(0).intValue() + sequence.indexOf(cseq) + cseq.length() - 1);
                 }
                 query = new StringBuilder();
+                query.append("{!complexphrase inOrder=true}");
+
                 cseq = complement(endSeq);
                 for (int i = 0; i < 5; i++) {
                     query.append("seq:\"").append(wildcard(cseq,i, false)).append(i == 4 ? "\"" : "\" OR ");
                 }
-                results = solrClientTool.find("t2t", query.toString(), true);
-                sdl = results.getDocs();
+                sdl = solrClientTool.find("t2t", query.toString());
                 if (sdl.size() == 0) {
-                    log.error("Neither forward nor reverse sequence found");
+                    log.error("No reverse ending sequence found");
                     return null;
                 }
                 binder = new DocumentObjectBinder();
@@ -157,13 +159,14 @@ public class GeneMINDImpl implements GeneMIND, Serializable {
                 if (sequence.contains(startSeq)) {
                     gr.setStartPosition(item.getPosition().get(0).intValue() + sequence.indexOf(startSeq));
                 }
+                query = new StringBuilder();
+                query.append("{!complexphrase inOrder=true}");
                 for (int i = 0; i < 5; i++) {
-                    query.append("seq:\"").append(wildcard(endSeq,i, false)).append(i == 4 ? "\"" : "\" OR ");
+                    query.append("seq:\"").append(wildcard(endSeq, i, false)).append(i == 4 ? "\"" : "\" OR ");
                 }
-                results = solrClientTool.find("t2t", query.toString(), true);
-                sdl = results.getDocs();
+                sdl = solrClientTool.find("t2t", query.toString());
                 if (sdl.size() == 0) {
-                    log.error("Neither forward nor reverse sequence found");
+                    log.error("Could not find ending strand for gene");
                     return null;
                 }
                 binder = new DocumentObjectBinder();

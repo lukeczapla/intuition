@@ -1,6 +1,6 @@
 {
   "name": "intuition",
-  "homepage": "http://localhost:7050/intuition",
+  "homepage": "https://curationsystem.org/intuition",
   "version": "0.99.1",
   "private": true,
   "dependencies": {

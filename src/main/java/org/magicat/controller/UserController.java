@@ -65,7 +65,7 @@ public class UserController {
     @ApiOperation(value = "Authenticate the provided user", notes = "User information obtained from MSKCC LDAP on DC")
     @RequestMapping(value = "/conf/user", method = RequestMethod.POST)
     public String login(@RequestBody User user) throws Exception {
-        if (user == null || user.getEmailAddress() == null) {
+        if (user == null || user.getEmailAddress() == null || !user.getEmailAddress().contains("@mskcc.org")) {
             return "Invalid data";
         }
         /*Map<String, Object> items = userDetailsService.fetchLDAP(user.getEmailAddress(), user.getPassword());

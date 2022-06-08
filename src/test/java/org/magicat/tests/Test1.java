@@ -1829,6 +1829,17 @@ public class Test1 {
                 //count++;
                 //if (count < 70000) continue;
                 String refSeq = rs.getName().split(":")[0];
+                boolean found = false;
+                for (int i = 0; i < 25; i++) {
+                    if (refSeq.equals(gb2rs[i][1])) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    System.out.println("Skipping " + refSeq);
+                    continue;
+                }
                 String gene = rs.getDescription().split(" ")[0];
                 /*
                 int chromosome = -1;
@@ -1856,20 +1867,36 @@ public class Test1 {
 
                 System.out.print(count++ + " : " + gene + "\t" + refSeq + "\t\t" + chromosome);
                 System.out.println();
+                if (count < 4403) continue;
                 List<Target> targets = targetRepository.findAllBySymbol(gene);
                 //geneMIND.setReportEnd(false);
                 //geneMIND.findSequence(rs.seqString().substring(0, Math.min(50, rs.seqString().length())), false);
-                org.magicat.MIND.GeneMIND.GeneResult gr = geneMIND.findGene(rs.seqString().substring(0, Math.min(60, rs.seqString().length())), rs.seqString().substring(Math.max(50, rs.seqString().length()-50)));
+                if (rs.seqString().length() < 20) continue;
+                org.magicat.MIND.GeneMIND.GeneResult gr = geneMIND.findGene(rs.seqString().substring(0, Math.min(50, rs.seqString().length())), rs.seqString().substring(Math.max(20, rs.seqString().length()-50)));
+                if (gr == null) {
+                    String startP;
+                    if (rs.getName().contains(":c")) startP = rs.getName().substring(rs.getName().indexOf(":c")+2, rs.getName().indexOf("-"));
+                    else startP = rs.getName().substring(rs.getName().indexOf(":")+1, rs.getName().indexOf("-"));
+                    String endP = rs.getName().substring(rs.getName().indexOf("-")+1);
+                    for (Target target: targets) {
+                        target.setStartPosition(Long.parseLong(startP));
+                        target.setEndPosition(Long.parseLong(endP));
+                        target.setRefSeq(refSeq);
+                        target.setForward(Integer.parseInt(startP) < Integer.parseInt(endP));
+                    }
+                    targetRepository.saveAll(targets);
+                    continue;
+                }
                 if (targets != null && targets.size() > 0) {
                     for (Target target: targets) {
                         target.setRefSeq(refSeq);
                         target.setChromosome(gr.getChromosome());
-                        if (gr != null && gr.getStartPosition() > 0) target.setStartPosition((long)gr.getStartPosition());
+                        if (gr.getStartPosition() > 0) target.setStartPosition((long)gr.getStartPosition());
                         target.setForward(gr.isForward());
                         target.setEndPosition((long)gr.getEndPosition());
                     }
                     Target target = targets.get(0);
-                    System.out.println(target.getSymbol() + " " + target.getForward() + " " + target.getRefSeq() + " " + target.getStartPosition() + "-" + target.getEndPosition());
+                    System.out.println(rs.getName() + "\t\t" + target.getSymbol() + " " + target.getForward() + " " + target.getRefSeq() + " " + target.getStartPosition() + "-" + target.getEndPosition());
                     targetRepository.saveAll(targets);
                 } else {
                     Target target = new Target();

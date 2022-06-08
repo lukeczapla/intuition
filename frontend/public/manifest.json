@@ -1,6 +1,6 @@
 {
   "short_name": "CurationAssistant",
-  "name": "Curation Assistant for MSKCC",
+  "name": "Curation Assistant for Cancer Variants - OncoKB",
   "icons": [
     {
       "src": "favicon.ico",
