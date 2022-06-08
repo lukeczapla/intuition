@@ -10,8 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.access.annotation.Secured;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -72,32 +72,35 @@ public interface ArticleRepository extends MongoRepository<Article, String> {
     List<Article> findMatchingArticles(String regex);
 
     @NotNull
+    @RestResource(exported = false)
     <S extends Article> List<S> saveAll(@NotNull Iterable<S> entities);
 
     @NotNull
+    @RestResource(exported = false)
     <S extends Article> S insert(@NotNull S entity);
 
     @NotNull
+    @RestResource(exported = false)
     <S extends Article> List<S> insert(@NotNull Iterable<S> entities);
 
     @NotNull
+    @RestResource(exported = false)
     <S extends Article> S save(@NotNull S entity);
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void deleteById(@NotNull String id);
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void delete(@NotNull Article article);
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void deleteAll(@NotNull Iterable<? extends Article> articles);
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void deleteAll();
-
 
 }

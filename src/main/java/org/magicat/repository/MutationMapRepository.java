@@ -5,6 +5,7 @@ import org.magicat.model.MutationMap;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.security.access.annotation.Secured;
 
 import java.util.List;
@@ -20,33 +21,37 @@ public interface MutationMapRepository extends MongoRepository<MutationMap, Stri
     @Query(value = "{synonyms: {$exists: true}}")
     List<MutationMap> findAllWithSynonyms();
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     <S extends MutationMap> List<S> saveAll(Iterable<S> entities);
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     <S extends MutationMap> S insert(S entity);
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     <S extends MutationMap> List<S> insert(Iterable<S> entities);
 
+    @RestResource(exported = false)
     <S extends MutationMap> S save(S entity);
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void deleteById(String id);
 
     @Override
+    @RestResource(exported = false)
     void delete(MutationMap mutationMap);
 
     @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void deleteAll(Iterable<? extends MutationMap> mutationMaps);
 
     @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void deleteAll();
 
 

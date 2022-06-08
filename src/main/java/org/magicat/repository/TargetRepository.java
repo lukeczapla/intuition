@@ -7,7 +7,7 @@ import org.magicat.model.Target;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,37 +26,40 @@ public interface TargetRepository extends MongoRepository<Target, ObjectId> {
     @NotNull
     //@Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     <S extends Target> List<S> saveAll(@NotNull Iterable<S> entities);
 
     @NotNull
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     <S extends Target> S insert(@NotNull S entity);
 
     @NotNull
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
+
     <S extends Target> List<S> insert(@NotNull Iterable<S> entities);
 
 
     @NotNull
     @Override
+    @RestResource(exported = false)
     <S extends Target> S save(@NotNull S entity);
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void deleteById(@NotNull ObjectId id);
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void delete(@NotNull Target target);
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void deleteAll(@NotNull Iterable<? extends Target> targets);
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void deleteAll();
 
 }

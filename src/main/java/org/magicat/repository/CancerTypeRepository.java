@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.util.List;
 
@@ -31,10 +31,12 @@ public interface CancerTypeRepository extends MongoRepository<CancerType, String
 
     @NotNull
     @Override
+    @RestResource(exported = false)
     <S extends CancerType> S insert(@NotNull S s);
 
     @NotNull
     @Override
+    @RestResource(exported = false)
     <S extends CancerType> List<S> insert(@NotNull Iterable<S> iterable);
 
     @NotNull
@@ -50,21 +52,23 @@ public interface CancerTypeRepository extends MongoRepository<CancerType, String
 
     @NotNull
     @Override
+    @RestResource(exported = false)
     <S extends CancerType> List<S> saveAll(@NotNull Iterable<S> iterable);
 
     @NotNull
     @Override
+    @RestResource(exported = false)
     <S extends CancerType> S save(@NotNull S s);
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void deleteById(@NotNull String s);
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void delete(@NotNull CancerType cancerType);
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void deleteAll(@NotNull Iterable<? extends CancerType> iterable);
 }

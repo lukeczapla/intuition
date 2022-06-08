@@ -960,6 +960,7 @@ const Intuition = (props) => {
               up a new alteration search.  Often, collecting the PDF articles first will greatly assist in finding specific locations in the text where the terms appear and you can
               look at three representations of text or directly open the highlighted PDF file.
             </Card.Text>
+            <Button variant="primary" onClick={() => setKey("analyze")}>Go to Analyze</Button>
           </Card.Body>
         </Card>
         <div aria-live="polite" aria-atomic="true" style={{position: 'relative', minHeight: '100px'}}>

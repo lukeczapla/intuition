@@ -6,7 +6,7 @@ import org.magicat.model.DrugMap;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,37 +30,38 @@ public interface DrugMapRepository extends MongoRepository<DrugMap, String> {
     List<DrugMap> findCancerDrugs();
 
     @NotNull
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     <S extends DrugMap> List<S> saveAll(@NotNull Iterable<S> entities);
 
     @NotNull
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     <S extends DrugMap> S insert(@NotNull S entity);
 
     @NotNull
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     <S extends DrugMap> List<S> insert(@NotNull Iterable<S> entities);
 
     @NotNull
+    @RestResource(exported = false)
     <S extends DrugMap> S save(@NotNull S entity);
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void deleteById(@NotNull String id);
 
-    //@Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void delete(@NotNull DrugMap drugMap);
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void deleteAll(@NotNull Iterable<? extends DrugMap> drugMaps);
 
-    @Secured("ROLE_ADMIN")
     @Override
+    @RestResource(exported = false)
     void deleteAll();
 
 
