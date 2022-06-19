@@ -1867,7 +1867,7 @@ public class Test1 {
 
                 System.out.print(count++ + " : " + gene + "\t" + refSeq + "\t\t" + chromosome);
                 System.out.println();
-                if (count < 4403) continue;
+                if (count < 12364) continue;
                 List<Target> targets = targetRepository.findAllBySymbol(gene);
                 //geneMIND.setReportEnd(false);
                 //geneMIND.findSequence(rs.seqString().substring(0, Math.min(50, rs.seqString().length())), false);

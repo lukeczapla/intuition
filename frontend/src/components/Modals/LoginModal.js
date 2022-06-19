@@ -115,33 +115,13 @@ const LoginModal = (props) => {
     }
 
     return (
-        <Modal show={props.show} onHide={props.onClose} backdrop="static" size="lg" keyboard={true} centered>
+        <Modal show={props.show} onHide={props.onClose} backdrop="static" size="md" keyboard={true} centered>
             <Modal.Header closeButton>
                 <Modal.Title>Log In to Curation Assistant</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form>
-                <Form.Group controlId="formBasicEmail">
-                    <Form.Label>Email address (or username)</Form.Label>
-                    <Form.Control type="email" placeholder="Enter mskcc.org email" value={email} name="email" onChange={update} autoComplete="username" />
-                    <Form.Text className="text-muted">
-                        These are the same as the login credentials to your emails and other MSK resources
-                    </Form.Text>
-                </Form.Group>
-
-                <Form.Group controlId="formBasicPassword">
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control type="password" placeholder="Password" value={password} name="password" onChange={update} autoComplete="current-password" />
-                </Form.Group>
-                </Form>
-
-                <Alert show={!validated} variant="danger">Log in failed: Please check your email address (must be mskcc.org) and password</Alert>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={props.onClose}>Close</Button>
-                <Button variant="primary" id="submitButton123" onClick={() => loginLDAP()}>Sign In</Button>
                 <GoogleLogin clientId={clientId} buttonText="Google Login" onSuccess={loginGoogle} cookiePolicy={'single_host_origin'} isSignedIn={true} />
-            </Modal.Footer>
+            </Modal.Body>
         </Modal>
     );
 }

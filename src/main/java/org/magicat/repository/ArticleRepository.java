@@ -12,13 +12,15 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.format.annotation.DateTimeFormat;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-@Api(tags = "Article Entities - full Pubmed data on articles (in the millions) with pmid, pmcid, doi, and pii")
+@Api(tags = "Article Entities - full Pubmed data on articles (in the millions) with pmid, pmcid, doi, and pii") @ApiIgnore
 @RepositoryRestResource(collectionResourceRel = "articles", path = "articles")
 public interface ArticleRepository extends MongoRepository<Article, String> {
+
     Article findByPmId(String pmId);
     Article findByPmcId(String pmcId);
     Article findByDoi(String doi);
@@ -71,6 +73,8 @@ public interface ArticleRepository extends MongoRepository<Article, String> {
     @Query(value = "{ 'fulltext' : {$regex: ?0} }", fields = "{'pmId': 1}")
     List<Article> findMatchingArticles(String regex);
 
+
+
     @NotNull
     @RestResource(exported = false)
     <S extends Article> List<S> saveAll(@NotNull Iterable<S> entities);
@@ -94,6 +98,8 @@ public interface ArticleRepository extends MongoRepository<Article, String> {
     @Override
     @RestResource(exported = false)
     void delete(@NotNull Article article);
+
+
 
     @Override
     @RestResource(exported = false)
