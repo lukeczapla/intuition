@@ -4,14 +4,15 @@
 
 ## RECENT CHANGES:
 Google OAuth2 is activated for authentication and the /conf/usergoogle endpoint used to transmit the user email and TokenId provided by Google for validation.
-The LDAP/SAML was deactivated, any current name (e.g. MSK ID) in the MongoDB still works without credentials and the demo frontend now includes the Google login through LoginModal popup with the Google sign-in button.
+The LDAP/SAML was deactivated, now uses the Google login through LoginModal popup with the Google sign-in button.
 Lastly, the endpoint is now "/intuition", it is true that curators rely on intuition about repeated observations from reading the text as a career, that is/has been the most profitable way to find functional sentences in the demo frontend.
+Tools for sequencing are under test status development and the genes are indexed via Apache Solr with unique coverage algorithm based partly on Czapla et al. JMB 2008.
 
 LATEST ITEMS: T2T-CHM13v2.0 reference genome Lucene indexing Test1.readFASTA(), this enables search (e.g., fuzzy search for mutations) of DNA sequences,
 TestMIND.testSeqSearch() shows an Abl1 query that looks for sequence on forward and reverse strands and locates the Abl1 coding region on Chromosome 9.
 The related dataset from NCBI has 72,439 genes with gene, mRNA transcript, and amino acid sequence for each gene ("Targets" collection in MongoDB contains the chromosome/location data for T2T-CHM13v2.0 dataset).
 GCA_009914755.4_T2T-CHM13v2.0_genomic.fna from NCBI is used as the data input, and Test1.readGenes() works with the NCBI data for
-gene sequences and also transcripts, validating their locations and adding to the Targets collection in MongoDB.
+gene sequences and also RNA transcripts, validating their locations and adding to the Targets collection in MongoDB.
 
 REQUIRED improvements: The one greatest biggest criteria is on the PDF2HTML (and the other paragraph / structured table + figures endpoint delivered as JSON) for the advanced cases, selling this was never a goal but it's almost like it has to be good enough to ace the edge cases (latest graphs in some PMIDs >~ 33000000 encoded with newer approaches - great for PDF highlighting but bad for sectionalizing the photo/image components) to fully upgrade to the newest pipeline.
 
