@@ -672,8 +672,8 @@ const Intuition = (props) => {
   const renderSearchHeader = () => {
     if (key === "home" || key === 'item') {
       return (
-      <div className="searchBody">
-      <br/><br/>
+          <div className="searchBody"></div>
+      /*<br/><br/>
       <b style={{color: "white"}}>Enter any search term that may or may not include gene of interest:</b>
       <InputGroup id="inputGroup-sizing-sm" className="mb-3">
         <FormControl name="searchText" onChange={textChanged} value={searchText} onKeyPress={event => {
@@ -710,7 +710,7 @@ const Intuition = (props) => {
       </Col>
       </Row>
       <br/>
-      </div>
+      </div>*/
       );
     }
     if (key === "curate") {
@@ -922,7 +922,7 @@ const Intuition = (props) => {
       <Button variant="success">{popoverTitle()}</Button>
     </OverlayTrigger>
     <div style={{float: "right"}}>
-    <DropdownButton id="dropdown-item-button" title={user !== null ? 'Account Menu (' + user.emailAddress + ')' : 'Logged Out'}>
+    <DropdownButton id="dropdown-item-button" title={user !== null ? '' + user.emailAddress + '' : 'Logged Out'}>
       <Dropdown.ItemText><b>User Menu</b></Dropdown.ItemText>
       {isAuthenticated && user !== null ?
       <>
