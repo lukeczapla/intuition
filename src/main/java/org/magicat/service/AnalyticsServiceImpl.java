@@ -207,8 +207,10 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             List<String> geneSynonyms = null;
             if (targetList != null && targetList.size() > 0) {
                 for (Target t : targetList) {
-                    if (geneSynonyms == null) geneSynonyms = Arrays.asList(t.getSynonyms().split(";"));
-                    else geneSynonyms.addAll(Arrays.asList(t.getSynonyms().split(";")));
+                    if (t.getSynonyms() != null) {
+                        if (geneSynonyms == null) geneSynonyms = new ArrayList<>(List.of(t.getSynonyms().split(";")));
+                        else geneSynonyms.addAll(Arrays.asList(t.getSynonyms().split(";")));
+                    }
                 }
             }
             List<String> mutationSynonyms = (mutation != null && !AminoAcids.mutationSynonym(mutation).equalsIgnoreCase(mutation) ? new ArrayList<>() : null);
@@ -562,7 +564,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         }
         if (geneSynonyms == null) {
             List<Target> targets = targetRepository.findAllBySymbol(gene);
-            if (targets.size() > 0) geneSynonyms = Arrays.asList(targets.get(0).getSynonyms().split(";"));
+            if (targets.size() > 0 && targets.get(0).getSynonyms() != null) geneSynonyms = Arrays.asList(targets.get(0).getSynonyms().split(";"));
         }
         String[] urls = v.getArticleURLs().split(" ");
         Map<String, Integer> scores = new HashMap<>();
