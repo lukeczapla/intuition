@@ -72,7 +72,7 @@ const TargetGene = (props) => {
               <Row className="justify-content-md-center"><Col><h4><b>Family:</b> {item.family}</h4></Col></Row>
               <Row><h4><b>Variants:</b></h4></Row>
               <Row className="justify-content-md-center" style={{borderStyle: "ridge"}}>
-                {props.auth && variants.length > 0 ? variants.filter(v => v.consensusPMIDs !== null && v.mutation !== null && v.mutation !== '').map(v => (v.articlesTier1.length > 0 &&
+                {props.auth && variants.length > 0 ? variants.filter(v => v.consensusPMIDs !== null && v.mutation !== null && v.mutation !== '').map(v => (v.articlesTier1 != null && v.articlesTier1.length > 0 &&
                     <Col style={{borderStyle: "ridge"}}><Button size="sm"
                                                                 onClick={() => props.push(v)}>{v.mutation} {v.cancerTypes !== null ? " in " + v.cancerTypes : ""} {v.drugs !== null ? " with " + v.drugs : ""}</Button></Col>)) : null}
               </Row>

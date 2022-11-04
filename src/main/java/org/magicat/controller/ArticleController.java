@@ -32,6 +32,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.*;
@@ -118,7 +119,7 @@ public class ArticleController {
 
     @ApiOperation(value = "Download and view the PMC article if available for the given PubMed ID, integrating text and SI into system")
     @RequestMapping(value = "/getPDFs/{pmid}.pdf", method = RequestMethod.GET, produces = {"application/pdf"})
-    public byte[] getPDFArticle(@PathVariable String pmid, @RequestParam(required = false) String terms, HttpServletResponse response) throws IOException {
+    public byte[] getPDFArticle(@PathVariable String pmid, @RequestParam(required = false) String terms, HttpServletRequest request, HttpServletResponse response) throws IOException {
         Optional<FullText> of = fullTextRepository.findById(pmid);
         if (of.isPresent()) {
             FullText f = of.get();
@@ -131,7 +132,7 @@ public class ArticleController {
                     .sorted(Comparator.comparingInt(a -> a.getFilename().length())).collect(Collectors.toList());
             if (result.size() == 0) {
                 log.info("Attempting redirect to DOCX endpoint");
-                response.sendRedirect("redirect:/getDOCX/" + pmid + ".docx");
+                response.sendRedirect(request.getContextPath() + "/getDOCX/" + pmid + ".docx");
                 return null;
             }
             for (GridFSFile x : result) {

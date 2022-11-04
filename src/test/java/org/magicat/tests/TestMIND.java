@@ -37,7 +37,9 @@ public class TestMIND {
     @Test
     void testSeqSearch() {
         // Abl1 synthetic construct sequence
-        List<SequenceItem> sequences = geneMIND.findSequence("AGACACCTCTGCCCTCACCATGAGCCTCTGGCAGCCCCTGGTCCTGGTGCTCCTGGTGCTGGGCTGCTGC", true);//geneMIND.findSequence("tcccccaactacgacaagtg");
+        //List<SequenceItem> sequences = geneMIND.findSequence("AGACACCTCTGCCCTCACCATGAGCCTCTGGCAGCCCCTGGTCCTGGTGCTCCTGGTGCTGGGCTGCTGC", true);//geneMIND.findSequence("tcccccaactacgacaagtg");
+        List<SequenceItem> sequences = geneMIND.findSequence("GGGAGACACCTCTGCCCTCA", true);//geneMIND.findSequence("tcccccaactacgacaagtg");
+
         Map<String, Map<String, List<String>>> highlightingMap = geneMIND.getHighlightingMap();
         if (sequences != null && sequences.size() == 2 && Math.abs(sequences.get(0).getPosition().get(0)-sequences.get(1).getPosition().get(0)) == 100) {
             if ((sequences.get(0).getPosition().get(0)-1) % 200 != 0) sequences.remove(0);
@@ -46,8 +48,8 @@ public class TestMIND {
         if (sequences != null && sequences.size() > 0) for (SequenceItem s: sequences) {
             System.out.println(s.getChromosome() + " : " + s.getSeq());
             System.out.println(s);
-            if (geneMIND.isForward()) System.out.println("Forward strand at position " + geneMIND.getPosition());
-            else System.out.println("Reverse strand starting at position " + geneMIND.getPosition());
+            if (geneMIND.isForward()) System.out.println("Forward strand at position " + s.getPosition());
+            else System.out.println("Reverse strand starting at position " + s.getPosition());
             //System.out.println(highlightingMap);
             if (highlightingMap.get(s.getId()) != null) for (String str: highlightingMap.get(s.getId()).keySet()) {
                 System.out.println(highlightingMap.get(s.getId()).get(str));
@@ -58,7 +60,6 @@ public class TestMIND {
 SequenceItem(id=3da654e, chromosome=[Chr 9], name=[CP068269.2], position=[143067601], genbank=[CP068269.2], refseq=[NC_060933.1], seq=[tctgt gggct gaagg ctgtt ccctg tttcc ttcag ctcta cgtct cctcc gagag ccgct tcaac accct ggccg agttg gttca tcatc attca acggt ggccg acggg ctcat cacca cgctc catta tccag cccca aagcg caaca agccc actgt ctatg gtgtg tcccc caact acgac aagtg ggaga tggaa])
         [Chr 9] : [ggccg acggg ctcat cacca cgctc catta tccag cccca aagcg caaca agccc actgt ctatg gtgtg tcccc caact acgac aagtg ggaga tggaa cgcac ggaca tcacc atgaa gcaca agctg ggcgg gggcc agtac gggga ggtgt acgag ggcgt gtgga agaaa tacag cctga cggtg gccgt gaaga]
 SequenceItem(id=1ee1177c, chromosome=[Chr 9], name=[CP068269.2], position=[143067701], genbank=[CP068269.2], refseq=[NC_060933.1], seq=[ggccg acggg ctcat cacca cgctc catta tccag cccca aagcg caaca agccc actgt ctatg gtgtg tcccc caact acgac aagtg ggaga tggaa cgcac ggaca tcacc atgaa gcaca agctg ggcgg gggcc agtac gggga ggtgt acgag ggcgt gtgga agaaa tacag cctga cggtg gccgt gaaga])
-
          */
     }
 

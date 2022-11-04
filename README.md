@@ -101,8 +101,8 @@ The Swagger documentation for the backend.
 
 ## Old deployment on AIML server (previously in use for OncoKB curators)
 
-Demo system: https://aimlcoe/knowledge
-Documentation: https://aimlcoe/knowledge/swagger-ui/
+Demo system: https://curationsystem.org/intuition
+Documentation: https://curationsystem.org/intuition/swagger-ui/
 
 
 #### P.P.S. also contains a few AI/ML endpoints for optimizing under limited sampling sizes with randomization tests, just some demos of DL4j with dropout regularization plus reweighting, where the TensorFlow backend can be substituted in or a Keras model written out for Python tensorflow.keras.  It's a survival of the fittest (evolutionary) approach to deep learning networks where the maximum-impact factors are the objective criteria for identification.  Seemed a valid alternative approach to, e.g., boosted trees (xgboost) with limited objective weights strongly dependent on randomization criteria.  These are in the montecarlo package and this and the SimulationController (endpoints to launch jobs with GPUs) can be removed.

@@ -188,7 +188,7 @@ public class GeneMINDImpl implements GeneMIND, Serializable {
     @Override
     public List<SequenceItem> findSequence(String seq, boolean fuzzy) {
         if (fuzzy) log.debug("Running fuzzy search to find issues with missing sequences");
-        seq = seq.toLowerCase().replace(" ", "");
+        seq = seq.toLowerCase().replace(" ", "");   // remove spaces
         SolrClientTool solrClientTool = solrService.getSolrClientTool();
         solrClientTool.setCollection("t2t");
         solrClientTool.setParser("lucene");
@@ -223,11 +223,13 @@ public class GeneMINDImpl implements GeneMIND, Serializable {
                     forward = true;
                     if (!reportEnd) position = item.getPosition().get(0) + sequence.indexOf(seq);
                     else position = item.getPosition().get(0) + sequence.indexOf(seq) + seq.length();
+                    item.setPosition(List.of(position));
                 }
                 if (sequence.contains(cseq)) {
                     forward = false;
                     if (!reportEnd) position = item.getPosition().get(0) + sequence.indexOf(cseq) + cseq.length();
                     else position = item.getPosition().get(0) + sequence.indexOf(cseq);
+                    item.setPosition(List.of(position));
                 }
             } else if (result != null && result.size() > 2 && fuzzy) {
                 log.debug("FUZZY PROBLEM - TOO MANY SEQUENCES FOUND, {}", result.size());

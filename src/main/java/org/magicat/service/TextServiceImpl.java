@@ -406,7 +406,7 @@ public class TextServiceImpl implements TextService {
             if (count == 1) return true;
             if (count > 1 && total > 1) return true;
         }
-        for (String gs : geneSynonyms) {
+        if (geneSynonyms != null) for (String gs : geneSynonyms) {
             p = Pattern.compile("\\b" + gs + "\\W+(?:\\w+\\W+){0,20}?" + mutation + "\\b", Pattern.CASE_INSENSITIVE);
             m = p.matcher(text);
             while (m.find()) {
