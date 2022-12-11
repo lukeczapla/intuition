@@ -37,11 +37,11 @@ def tree(root):
 
 def get_pub_content(ids, done=False, xmlfile="pubmed.xml"):
     res = requests.get(
-        url=f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id={','.join(ids)}&rettype=text"
+        url=f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id={','.join(ids)}&rettype=xml"
     )
     text = res.text
     result = ''
-    # print(text)
+    #print(,text)
     try:
         if os.path.exists(xmlfile):
             if done:
@@ -53,8 +53,8 @@ def get_pub_content(ids, done=False, xmlfile="pubmed.xml"):
                 result = text
             else:
                 result = text[:text.index('</PubmedArticleSet>')]
-    except:
-        print("ERROR")
+    except Exception as err:
+        print("ERROR", err)
     file1 = open(xmlfile, "a+")
     file1.write(result)
     file1.close()
