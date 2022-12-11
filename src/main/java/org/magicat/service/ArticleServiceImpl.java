@@ -13,6 +13,7 @@ import org.magicat.repository.CancerTypeRepository;
 import org.magicat.repository.DrugMapRepository;
 import org.magicat.repository.ProjectListRepository;
 import org.magicat.util.ProcessUtil;
+import org.magicat.util.Pubmed;
 import org.magicat.util.Tree;
 import org.magicat.util.XMLParser;
 import org.slf4j.Logger;
@@ -25,7 +26,9 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -341,10 +344,12 @@ public class ArticleServiceImpl implements ArticleService {
         if (processArticles.size() > 5000 || (articles == null && processArticles.size() > 0)) {
             for (List<Article> processBatch: Lists.partition(processArticles, 200)) {
                 StringBuilder items = new StringBuilder();
+                List<Integer> pmids = new ArrayList<>();
                 for (int i = 0; i < processBatch.size(); i++) {
                     if (processBatch.get(i) != null) {
                         if (i == 0) items.append(processBatch.get(i).getPmId().trim());
                         else items.append(",").append(processBatch.get(i).getPmId().trim());
+                        pmids.add(Integer.parseInt(processBatch.get(i).getPmId()));
                     }
                 }
                 try {
@@ -352,7 +357,12 @@ public class ArticleServiceImpl implements ArticleService {
                     boolean valid = false;
                     do {
                         try {
-                            ProcessUtil.runScript("python3 python/pubmed_list.py " + items);
+                            PrintWriter out = new PrintWriter("pubmed_list.xml");
+                            out.println(Pubmed.getXML(pmids));
+                            out.flush();
+                            out.close();
+                            // TO-DO verify
+                            //ProcessUtil.runScript("python3 python/pubmed_list.py " + items);
                             setupProcess();
                             valid = true;
                         } catch (IOException e) {
@@ -421,6 +431,20 @@ public class ArticleServiceImpl implements ArticleService {
 
     public String runSearchPython(String term, int size) {
         if (term == null) return null;
+
+        String XMLFile = "pubmed" + term.hashCode() + ".xml";
+        Pubmed.relevance = relevance;
+        try {
+            Thread.sleep(200);
+            PrintWriter out = new PrintWriter(XMLFile);
+            out.println(Pubmed.getXML(Pubmed.getIds(term, size)));
+            out.flush();
+            out.close();
+        } catch (FileNotFoundException | InterruptedException e) {
+            log.error("Exception occurred during XML retrieval: {}", e.getMessage());
+        }
+        return XMLFile;
+        /*
         String XMLFile = "";
         try {
             log.info("RUNNING PYTHON");
@@ -430,7 +454,7 @@ public class ArticleServiceImpl implements ArticleService {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
-        return XMLFile;
+        return XMLFile;*/
     }
 
     public String runSearchPython(String term, String synonyms, int size) {
@@ -443,10 +467,15 @@ public class ArticleServiceImpl implements ArticleService {
             }
         }
         try {
-            log.info("RUNNING PYTHON");
+            //log.info("RUNNING PYTHON"); //Now Java
             XMLFile = "pubmed" + searchTerm.toString().hashCode() + ".xml";
-            ProcessUtil.runScript("python3 python/pubmed.py " + size + " " + XMLFile + " " + searchTerm.toString().trim());
-        } catch (IOException e) {
+            Thread.sleep(200);
+            PrintWriter out = new PrintWriter(XMLFile);
+            out.println(Pubmed.getXML(Pubmed.getIds(searchTerm.toString(), size)));
+            out.flush();
+            out.close();
+            //ProcessUtil.runScript("python3 python/pubmed.py " + size + " " + XMLFile + " " + searchTerm.toString().trim());
+        } catch (InterruptedException | FileNotFoundException e) {
             log.error(e.getMessage());
         }
         return XMLFile;
@@ -558,7 +587,7 @@ public class ArticleServiceImpl implements ArticleService {
             log.info(projectList.getNames().get(i) + " searchTerm = " + searchTerm);
             terms.add(searchTerm.toString());
         }
-        runSearches(terms, 500);
+        runSearches(terms, 600);
     }
 
     void populateDrugs() {
@@ -590,7 +619,7 @@ public class ArticleServiceImpl implements ArticleService {
             }
             terms.add(term);
         }
-        runSearches(terms, 500);
+        runSearches(terms, 600);
     }
 
     void populateOncoBase() {
@@ -624,7 +653,7 @@ public class ArticleServiceImpl implements ArticleService {
             }
             terms.add(term);
         }
-        runSearches(terms, 500);
+        runSearches(terms, 600);
 
     }
 

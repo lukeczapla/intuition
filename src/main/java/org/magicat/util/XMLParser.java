@@ -73,7 +73,7 @@ public class XMLParser {
 
     public void merge(Object obj, Object update) {
         if (update == null) {
-            log.info("null update on merge");
+            //log.info("null update on merge");
             return;
         }
         if (!obj.getClass().isAssignableFrom(update.getClass())) {

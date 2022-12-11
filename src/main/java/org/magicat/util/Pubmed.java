@@ -31,12 +31,14 @@ import java.util.List;
  */
 public class Pubmed {
 
+    public static boolean relevance = false;
+
     public static List<Integer> getIds(String term, int count) {
         List<Integer> ids = new ArrayList<>();
         try {
             DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = builderFactory.newDocumentBuilder();
-            Document document = builder.parse("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=" + URLEncoder.encode(term, StandardCharsets.UTF_8) + "&retmax=" + count + "&sort=date");
+            Document document = builder.parse("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=" + URLEncoder.encode(term, StandardCharsets.UTF_8)+ "&retmax=" + count + "&sort=" + (relevance ? "relevance" : "date"));
             XPath xPath = XPathFactory.newDefaultInstance().newXPath();
             NodeList nodeList = (NodeList) xPath.compile("//Id").evaluate(document, XPathConstants.NODESET);
             for (int i = 0; i < nodeList.getLength(); i++) {
@@ -60,6 +62,7 @@ public class Pubmed {
             }
             String url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=" + idList + "&rettype=xml";
             try {
+                Thread.sleep(200);
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(new URI(url))
                         .timeout(Duration.of(10, ChronoUnit.SECONDS))
@@ -70,13 +73,30 @@ public class Pubmed {
                 String result = response.body();
                 if (xmlData.length() == 0) {
                     if (count == partitions.size() - 1) xmlData = new StringBuilder(result);
-                    else xmlData = new StringBuilder(result.substring(0, result.indexOf("</PubmedArticleSet>")));
+                    else {
+                        if (!result.contains("</PubmedArticleSet>")) {
+                            count = -1;
+                            xmlData = new StringBuilder();
+                            continue;
+                        }
+                        xmlData = new StringBuilder(result.substring(0, result.indexOf("</PubmedArticleSet>")));
+                    }
                 } else {
                     if (count == partitions.size() - 1) xmlData.append(result.substring(result.indexOf("<PubmedArticle>")));
-                    else xmlData.append(result, result.indexOf("<PubmedArticle>"), result.indexOf("</PubmedArticleSet>"));
+                    else {
+                        if (!result.contains("</PubmedArticleSet>")) {
+                            count = -1;
+                            xmlData = new StringBuilder();
+                            continue;
+                        }
+                        xmlData.append(result, result.indexOf("<PubmedArticle>"), result.indexOf("</PubmedArticleSet>"));
+                    }
                 }
             } catch (URISyntaxException | IOException | InterruptedException e) {
                 e.printStackTrace();
+                // start over
+                count = -1;
+                xmlData = new StringBuilder();
             }
         }
         return xmlData.toString();
