@@ -49,6 +49,8 @@ public class ArticleServiceImpl implements ArticleService {
     private final CancerTypeRepository cancerTypeRepository;
     private final DrugMapRepository drugMapRepository;
 
+    private final Pubmed pubmed = new Pubmed();
+
     private boolean relevance = false;
     private XMLParser parser = null;
     private int hashCode;
@@ -358,7 +360,7 @@ public class ArticleServiceImpl implements ArticleService {
                     do {
                         try {
                             PrintWriter out = new PrintWriter("pubmed_list.xml");
-                            out.println(Pubmed.getXML(pmids));
+                            out.println(pubmed.getXML(pmids));
                             out.flush();
                             out.close();
                             // TO-DO verify
@@ -429,15 +431,15 @@ public class ArticleServiceImpl implements ArticleService {
         return true;
     }
 
-    public String runSearchPython(String term, int size) {
+    public String runSearchPubmed(String term, int size) {
         if (term == null) return null;
 
         String XMLFile = "pubmed" + term.hashCode() + ".xml";
-        Pubmed.relevance = relevance;
+        pubmed.relevance = relevance;
         try {
             Thread.sleep(200);
             PrintWriter out = new PrintWriter(XMLFile);
-            out.println(Pubmed.getXML(Pubmed.getIds(term, size)));
+            out.println(pubmed.getXML(pubmed.getIds(term, size)));
             out.flush();
             out.close();
         } catch (FileNotFoundException | InterruptedException e) {
@@ -457,7 +459,7 @@ public class ArticleServiceImpl implements ArticleService {
         return XMLFile;*/
     }
 
-    public String runSearchPython(String term, String synonyms, int size) {
+    public String runSearchPubmed(String term, String synonyms, int size) {
         if (term == null) return null;
         String XMLFile = "";
         StringBuilder searchTerm = new StringBuilder(term);
@@ -471,7 +473,7 @@ public class ArticleServiceImpl implements ArticleService {
             XMLFile = "pubmed" + searchTerm.toString().hashCode() + ".xml";
             Thread.sleep(200);
             PrintWriter out = new PrintWriter(XMLFile);
-            out.println(Pubmed.getXML(Pubmed.getIds(searchTerm.toString(), size)));
+            out.println(pubmed.getXML(pubmed.getIds(searchTerm.toString(), size)));
             out.flush();
             out.close();
             //ProcessUtil.runScript("python3 python/pubmed.py " + size + " " + XMLFile + " " + searchTerm.toString().trim());
@@ -506,7 +508,8 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public void runSearches(List<String> terms, int size) {
-        Collections.shuffle(terms); // ensures that any error from throttling at the beginning is evenly distributed
+        // ensures that any error from throttling at the beginning is evenly distributed to average out over 2-3 iterations (4-6 days):
+        Collections.shuffle(terms);
         if (indexArticles()) {
             // 8 processes allowed into the system for less traffic, less failures
             final Semaphore concurrentDFSExecutions = new Semaphore(8);
@@ -518,7 +521,7 @@ public class ArticleServiceImpl implements ArticleService {
                     } catch (InterruptedException e) {
                         log.error("Somebody woke up the monster while sleeping, beware!");
                     }
-                    XMLFile = runSearchPython(g, size);
+                    XMLFile = runSearchPubmed(g, size);
                 }
 
                 log.info(g);
@@ -529,6 +532,8 @@ public class ArticleServiceImpl implements ArticleService {
                 } finally {
                     concurrentDFSExecutions.release();
                 }
+                //XMLFile = runSearchPubmed(g, size);
+                //if (XMLFile.length() > 0) runSearchCompleteParallel(XMLFile);
             });
         }
     }

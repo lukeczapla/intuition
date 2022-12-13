@@ -31,13 +31,20 @@ import java.util.List;
  */
 public class Pubmed {
 
-    public static boolean relevance = false;
+    public boolean relevance = false;
+    private long lastmillis = -1;
+    private static long delay = 200L;
 
-    public static List<Integer> getIds(String term, int count) {
+    public List<Integer> getIds(String term, int count) {
         List<Integer> ids = new ArrayList<>();
         try {
             DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = builderFactory.newDocumentBuilder();
+            long currentmillis = System.currentTimeMillis();
+            while (currentmillis - lastmillis < delay) {
+                currentmillis = System.currentTimeMillis();
+            }
+            lastmillis = currentmillis;
             Document document = builder.parse("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=" + URLEncoder.encode(term, StandardCharsets.UTF_8)+ "&retmax=" + count + "&sort=" + (relevance ? "relevance" : "date"));
             XPath xPath = XPathFactory.newDefaultInstance().newXPath();
             NodeList nodeList = (NodeList) xPath.compile("//Id").evaluate(document, XPathConstants.NODESET);
@@ -51,7 +58,7 @@ public class Pubmed {
         return ids;
     }
 
-    public static String getXML(List<Integer> ids) {
+    public String getXML(List<Integer> ids) {
         StringBuilder xmlData = new StringBuilder();
         List<List<Integer>> partitions = Lists.partition(ids,200);
         for (int count = 0; count < partitions.size(); count++) {
@@ -62,15 +69,20 @@ public class Pubmed {
             }
             String url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=" + idList + "&rettype=xml";
             try {
-                Thread.sleep(200);
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(new URI(url))
                         .timeout(Duration.of(10, ChronoUnit.SECONDS))
                         .GET()
                         .build();
                 HttpClient client = HttpClient.newBuilder().build();
+                long currentmillis = System.currentTimeMillis();
+                while (currentmillis - lastmillis < delay) {
+                    currentmillis = System.currentTimeMillis();
+                }
+                lastmillis = currentmillis;
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
                 String result = response.body();
+
                 if (xmlData.length() == 0) {
                     if (count == partitions.size() - 1) xmlData = new StringBuilder(result);
                     else {

@@ -425,7 +425,7 @@ public class TextServiceImpl implements TextService {
                 if (count == 1) return true;
                 if (count > 1 && total > 1) return true;
             }
-            for (String gs : geneSynonyms) {
+            if (geneSynonyms != null) for (String gs : geneSynonyms) {
                 p = Pattern.compile("\\b" + gs + "\\W+(?:\\w+\\W+){0,20}?" + mutationSynonym + "\\b", Pattern.CASE_INSENSITIVE);
                 m = p.matcher(text);
                 while (m.find()) {
@@ -436,15 +436,13 @@ public class TextServiceImpl implements TextService {
             }
 
         }
-        if (mutationSynonyms != null) {
-            for (String mut: mutationSynonyms) {
-                p = Pattern.compile("\\b" + gene + "\\W+(?:\\w+\\W+){0,20}?" + mut + "\\b", Pattern.CASE_INSENSITIVE);
-                m = p.matcher(text);
-                while (m.find()) {
-                    total++;
-                    if (count == 1) return true;
-                    if (count > 1 && total > 1) return true;
-                }
+        if (mutationSynonyms != null) for (String mut: mutationSynonyms) {
+            p = Pattern.compile("\\b" + gene + "\\W+(?:\\w+\\W+){0,20}?" + mut + "\\b", Pattern.CASE_INSENSITIVE);
+            m = p.matcher(text);
+            while (m.find()) {
+                total++;
+                if (count == 1) return true;
+                if (count > 1 && total > 1) return true;
             }
         }
         if (geneSynonyms != null) for (String synonym : geneSynonyms) {
