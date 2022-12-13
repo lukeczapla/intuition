@@ -160,6 +160,21 @@ public class Test1 {
     }
 
     @Test
+    public void testPubmed() throws IOException {
+        //List<Integer> pmids = Pubmed.getIds("DNA", 500);
+        Pubmed pubmed = new Pubmed();
+        PrintWriter out = new PrintWriter("tester.xml");
+        out.println(pubmed.getXML(pubmed.getIds("Endometrial cancer", 500)));
+        out.flush();
+        out.close();
+        try {
+            XMLParser parser = new XMLParser("tester.xml");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
     public void journalTiers() {
         List<Variant> variantsList = variantRepository.findAll();
         //Set<String> journalSet = Collections.synchronizedSet(new TreeSet<>());

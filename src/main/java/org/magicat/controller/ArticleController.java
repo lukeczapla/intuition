@@ -299,7 +299,7 @@ public class ArticleController {
         log.info(principal.getName());
         User user = userRepository.findByEmailAddress(principal.getName());
         if (user == null) {
-            log.error("No User?");
+            log.error("No User logged in");
             return null;
         }
         Map<String, Object> jobMap = userCache.get(user);
