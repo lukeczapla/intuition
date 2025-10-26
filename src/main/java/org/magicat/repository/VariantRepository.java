@@ -5,12 +5,13 @@ import org.magicat.model.Variant;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 
 @Api(tags = "Variant Entities - data on protein and gene variants from OncoKB curation")
 @Repository
-public interface VariantRepository extends MongoRepository<Variant, String> {
+public interface VariantRepository extends MongoRepository<Variant, ObjectId> {
 
     <S extends Variant> List<S> findAllByGeneAndMutationAndDrugsAndCancerTypes(String gene, String mutation, String drugs, String cancerTypes);
 

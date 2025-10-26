@@ -1,10 +1,8 @@
 import {useEffect, useState} from "react";
-import {GoogleLogin} from 'react-google-login';
+import {GoogleLogin} from "@react-oauth/google";
 import endpoint from "../../endpoint";
 import Modal from "react-bootstrap/Modal";
-import Form from "react-bootstrap/Form";
-import Alert from "react-bootstrap/Alert";
-import Button from "react-bootstrap/Button";
+import {jwtDecode} from "jwt-decode";
 
 const useEnterKeyListener = (props) => {
     useEffect(() => {
@@ -46,10 +44,40 @@ const useEnterKeyListener = (props) => {
 const LoginModal = (props) => {
 
     const [validated, setValidated] = useState(true);
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const clientId = '613395107842-nmr1dthih3c5ibcfcsrrkq61ef838ks8.apps.googleusercontent.com';
 
+    const loginGoogle = (res) => {
+        //if (email === '' || password === '') return;
+        const token = res.credential;
+        const userInfo = jwtDecode(token);
+        let user = {
+            emailAddress: userInfo.email,
+            tokenId: token,//res.getAuthResponse().id_token,
+            imageUrl: userInfo.picture,
+            firstName: userInfo.given_name,
+            lastName: userInfo.family_name
+        };
+        fetch(endpoint+"/conf/usergoogle", {method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(user)})
+            .then(result => result.text())
+            .then(data => {
+
+                if (data.startsWith("Finished") || data.startsWith("Created")) {
+                    console.log("SUCCESSFULLY LOGGED IN");
+                    props.onClose();
+                    props.onAuthenticate();
+                    setValidated(true);
+                }
+                else {
+                    //console.log("show message");
+                    setValidated(true);
+                    //setValidated(false);
+                }
+            });
+
+    }
     useEffect(() => {
         props.auth();
     }, []);
@@ -84,43 +112,13 @@ const LoginModal = (props) => {
             });
     }
 
-    const loginGoogle = (res) => {
-        //if (email === '' || password === '') return;
-        let user = {
-            emailAddress: res.profileObj.email,
-            tokenId: res.getAuthResponse().id_token,
-            imageUrl: res.profileObj.imageUrl
-        };
-        console.log(res.profileObj.tokenId);
-        if (typeof res.profileObj.name == "string" && res.profileObj.name.indexOf(" ") !== -1) {
-            user.firstName = res.profileObj.name.substring(0, res.profileObj.name.lastIndexOf(" "));
-            user.lastName = res.profileObj.name.substring(res.profileObj.name.lastIndexOf(" ")+1);
-        } else user.firstName = res.profileObj.name;
-        fetch(endpoint+"/conf/usergoogle", {method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(user)})
-            .then(result => result.text())
-            .then(data => {
-                //user.password = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';  // try to overwrite the password field for security
-                //console.log(data);
-                if (data.startsWith("Finished") || data.startsWith("Created")) {
-                    //setPassword('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
-                    props.onClose();
-                    props.onAuthenticate();
-                }
-                else {
-                    //console.log("show message");
-                    setValidated(false);
-                }
-            });
-
-    }
-
     return (
         <Modal show={props.show} onHide={props.onClose} backdrop="static" size="md" keyboard={true} centered>
             <Modal.Header closeButton>
                 <Modal.Title>Log In to Curation Assistant</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <GoogleLogin clientId={clientId} buttonText="Google Login" onSuccess={loginGoogle} cookiePolicy={'single_host_origin'} isSignedIn={true} />
+              <GoogleLogin clientId={clientId} buttonText="Google Login" onSuccess={loginGoogle} cookiePolicy={'single_host_origin'} isSignedIn={true} />            
             </Modal.Body>
         </Modal>
     );

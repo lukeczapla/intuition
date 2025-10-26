@@ -1,5 +1,6 @@
 import { useLocation, useHistory, withRouter, BrowserRouter, Router, Switch, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import Intuition from './Intuition.js';
 
 const Main = (props) => {
@@ -62,7 +63,13 @@ const Main = (props) => {
     };
   });
 
-  return (<Intuition {...props} state={state} onMove={handleChange} />);
+  return (
+  <GoogleOAuthProvider clientId={'613395107842-nmr1dthih3c5ibcfcsrrkq61ef838ks8.apps.googleusercontent.com'}>
+  <Intuition {...props} state={state} onMove={handleChange} />
+  </GoogleOAuthProvider>
+  )
+  
+  ;
 
 }
 

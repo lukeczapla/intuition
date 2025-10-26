@@ -254,7 +254,10 @@ const Intuition = (props) => {
     fetch(endpoint + "/conf/user/me")
     .then(response => response.json())
     .then(data => {
-      if (data.emailAddress !== undefined) setUser(data);
+      if (data.emailAddress !== undefined) {
+        setUser(data);
+        setAuthenticated(true);
+      }
       //if (reload) onReload();
     }).catch(e => {});
   }
@@ -331,12 +334,6 @@ const Intuition = (props) => {
   }
 
   const handleLogout = () => {
-    const auth2 = window.gapi.auth2.getAuthInstance();
-    if (auth2 != null) {
-      auth2.signOut().then(
-          auth2.disconnect().then({})
-    )
-    }
     fetch(endpoint + "/logout")
     .then(() => {
       setAuthenticated(false);
