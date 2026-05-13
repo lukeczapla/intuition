@@ -4,4 +4,5 @@ public interface Views {
     public static interface SimulationParameters {}
     public static interface ArticleFilters {}
     public static interface Section {}
+    public static interface Question {}
 }

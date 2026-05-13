@@ -2,6 +2,7 @@ import React, {useEffect, useState, createRef} from 'react';
 import endpoint from '../../endpoint.js';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
+import FormControl from 'react-bootstrap/FormControl';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
@@ -15,6 +16,8 @@ const Article = (props) => {
   const [article, setArticle] = useState(props.item);
   const [variant, setVariant] = useState(props.variant);
   const [resourceData, setResourceData] = useState([]);
+  const [query, setQuery] = useState("");
+  const [answer, setAnswer] = useState("");
   const [processing, setProcessing] = useState(false);
   const [PMIDSupporting, setPMIDSupporting] = useState([]);
   const [PMIDSelected, setPMIDSelected] = useState("");
@@ -59,6 +62,18 @@ const Article = (props) => {
     const formData = new FormData(e.target);
     //formData.append("attachment", uploadFiles[0], uploadFiles[0].name);
     sendData(formData);
+  }
+
+  const runQuery = () => {
+    if (query !== "") {
+      let formData = {
+        text: article.fulltext,
+        question: query
+      };
+      fetch(endpoint + "/articles/question", {method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData)}).then(response => response.text()).then(data => {
+        setAnswer(data);
+      });
+    }
   }
 
   const changeHandler = (pmid) => {
@@ -173,6 +188,16 @@ const Article = (props) => {
             </Row>
             {article.fulltext != null ?
                 <>
+                  <Row>
+                  <FormControl onChange={(e) => setQuery(e.target.value)} value={query} aria-label="Question" aria-describedby="basic-addon1" placeholder="Question to Ask" />
+                  <Button variant="outline-dark" onClick={() => runQuery()}>Ask Question</Button>
+                  </Row>
+                  {answer != "" &&
+                    <Row>
+                      <b>Answer:</b>
+                      <div style={{fontFamily: "sans-serif"}} dangerouslySetInnerHTML={{__html: highlight(answer)}}/>
+                    </Row>
+                  }
                   <Row>
                     <h3><u>Text</u></h3>
                   </Row>

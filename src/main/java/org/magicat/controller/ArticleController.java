@@ -5,6 +5,7 @@ import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -12,9 +13,9 @@ import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.magicat.model.*;
 import org.magicat.repository.*;
-import org.magicat.repository.FullTextRepository;
 import org.magicat.service.*;
 import org.magicat.util.AminoAcids;
+import org.magicat.util.ProcessUtil;
 import org.magicat.pdf.PDFHighlighter;
 import org.magicat.util.SolrClientTool;
 import org.magicat.util.TikaTool;
@@ -145,24 +146,25 @@ public class ArticleController {
             }
         }
         if (!pmid.contains("S") && articleService.addArticlePDF(pmid)) {
-            Stream<Path> walk = Files.walk(Paths.get("PMC/" + pmid));
-            List<String> result = walk
-                    .filter(p -> !Files.isDirectory(p))
-                    .map(Path::toString)
-                    .filter(f -> f.endsWith("pdf"))
-                    .sorted(Comparator.comparingInt(String::length))
-                    .collect(Collectors.toList());
-            if (result.size() > 0) {
-                File f = new File(result.get(0));
-                if (f.exists()) {
-                    new Thread(() -> fullTextService.addArticle(pmid)).start();
-                    if (terms == null || terms.length() == 0)
-                        return FileUtils.readFileToByteArray(f);
-                    else
-                        return new PDFHighlighter().highlight(FileUtils.readFileToByteArray(f), Arrays.stream(terms.split(",")).collect(Collectors.toList()));
-                }
-                return null;
-            } else return null;
+            try (Stream<Path> walk = Files.walk(Paths.get("PMC/" + pmid))) {
+                List<String> result = walk
+                        .filter(p -> !Files.isDirectory(p))
+                        .map(Path::toString)
+                        .filter(f -> f.endsWith("pdf"))
+                        .sorted(Comparator.comparingInt(String::length))
+                        .collect(Collectors.toList());
+                if (result.size() > 0) {
+                    File f = new File(result.get(0));
+                    if (f.exists()) {
+                        new Thread(() -> fullTextService.addArticle(pmid)).start();
+                        if (terms == null || terms.length() == 0)
+                            return FileUtils.readFileToByteArray(f);
+                        else
+                            return new PDFHighlighter().highlight(FileUtils.readFileToByteArray(f), Arrays.stream(terms.split(",")).collect(Collectors.toList()));
+                    }
+                    return null;
+                } else return null;
+            }
         } else {
             log.info("Not able to match PMID to full-text");
             return null;
@@ -234,56 +236,57 @@ public class ArticleController {
             }
         }
         if (!pmid.contains("S") && articleService.addArticlePDF(pmid)) {
-            Stream<Path> walk = Files.walk(Paths.get("PMC/" + pmid));
-            List<String> result = walk
-                    .filter(p -> !Files.isDirectory(p))
-                    .map(Path::toString)
-                    .filter(f -> f.endsWith("pdf"))
-                    .sorted(Comparator.comparingInt(String::length))
-                    .collect(Collectors.toList());
-            if (result.size() > 0) {
-                File f = new File(result.get(0));
-                if (f.exists()) {
-                    new Thread(() -> fullTextService.addArticle(pmid)).start();
-                    if (terms == null || terms.length() == 0)
-                        return FileUtils.readFileToByteArray(f);
-                    else {
-                        String[] items = terms.split(",");
-                        byte[] data = null;
-                        int ci = 0;
-                        for (String item: items) {
-                            if (item.equals("$KEYWORDS")) {
-                                List<String> words = new ArrayList<>();
-                                List<ProjectList> pitems = projectListRepository.findIdExpression("keywordListM");
-                                for (ProjectList p : pitems) {
-                                    words.addAll(p.getSynonyms());
-                                }
-                                if (data == null) data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(IOUtils.toByteArray(gridFsTemplate.getResource(result.get(0)).getContent()), words);
-                                else data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(data, words);
-                            } else if (item.startsWith("$ALTERATION") && item.contains("-")) {
-                                String term = item.substring(item.indexOf("-")+1);
-                                String synonym = AminoAcids.mutationSynonym(term);
-                                log.info("{} {}", term, synonym);
-                                if (!term.equals(synonym)) {
-                                    if (data == null) data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(IOUtils.toByteArray(gridFsTemplate.getResource(result.get(0)).getContent()), Arrays.asList(term, synonym));
-                                    else data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(data, Arrays.asList(term, synonym));
-                                    List<String> hotspotSynonyms = AminoAcids.hotspotSubstitution(term);
-                                    if (hotspotSynonyms != null) data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(data, hotspotSynonyms);
+            try (Stream<Path> walk = Files.walk(Paths.get("PMC/" + pmid))) {
+                List<String> result = walk
+                        .filter(p -> !Files.isDirectory(p))
+                        .map(Path::toString)
+                        .filter(f -> f.endsWith("pdf"))
+                        .sorted(Comparator.comparingInt(String::length))
+                        .collect(Collectors.toList());
+                if (result.size() > 0) {
+                    File f = new File(result.get(0));
+                    if (f.exists()) {
+                        new Thread(() -> fullTextService.addArticle(pmid)).start();
+                        if (terms == null || terms.length() == 0)
+                            return FileUtils.readFileToByteArray(f);
+                        else {
+                            String[] items = terms.split(",");
+                            byte[] data = null;
+                            int ci = 0;
+                            for (String item: items) {
+                                if (item.equals("$KEYWORDS")) {
+                                    List<String> words = new ArrayList<>();
+                                    List<ProjectList> pitems = projectListRepository.findIdExpression("keywordListM");
+                                    for (ProjectList p : pitems) {
+                                        words.addAll(p.getSynonyms());
+                                    }
+                                    if (data == null) data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(IOUtils.toByteArray(gridFsTemplate.getResource(result.get(0)).getContent()), words);
+                                    else data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(data, words);
+                                } else if (item.startsWith("$ALTERATION") && item.contains("-")) {
+                                    String term = item.substring(item.indexOf("-")+1);
+                                    String synonym = AminoAcids.mutationSynonym(term);
+                                    log.info("{} {}", term, synonym);
+                                    if (!term.equals(synonym)) {
+                                        if (data == null) data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(IOUtils.toByteArray(gridFsTemplate.getResource(result.get(0)).getContent()), Arrays.asList(term, synonym));
+                                        else data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(data, Arrays.asList(term, synonym));
+                                        List<String> hotspotSynonyms = AminoAcids.hotspotSubstitution(term);
+                                        if (hotspotSynonyms != null) data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(data, hotspotSynonyms);
+                                    } else {
+                                        if (data == null) data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(IOUtils.toByteArray(gridFsTemplate.getResource(result.get(0)).getContent()), Collections.singletonList(term));
+                                        else data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(data, Collections.singletonList(term));
+                                    }
                                 } else {
-                                    if (data == null) data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(IOUtils.toByteArray(gridFsTemplate.getResource(result.get(0)).getContent()), Collections.singletonList(term));
-                                    else data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(data, Collections.singletonList(term));
+                                    if (data == null) data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(IOUtils.toByteArray(gridFsTemplate.getResource(result.get(0)).getContent()), Collections.singletonList(item));
+                                    else data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(data, Collections.singletonList(item));
                                 }
-                            } else {
-                                if (data == null) data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(IOUtils.toByteArray(gridFsTemplate.getResource(result.get(0)).getContent()), Collections.singletonList(item));
-                                else data = new PDFHighlighter(parseColor(colors[ci % colors.length])).highlight(data, Collections.singletonList(item));
+                                ci++;
                             }
-                            ci++;
+                            return data;
                         }
-                        return data;
                     }
-                }
-                return null;
-            } else return null;
+                    return null;
+                } else return null;
+            }
         } else {
             log.info("Not able to match PMID to full-text");
             return null;
@@ -391,6 +394,25 @@ public class ArticleController {
             return "Success";
         } catch (IOException | SolrServerException e) {
             return "Failure: " + e.getMessage();
+        }
+    }
+
+    @ApiOperation(value = "Ask a question with text")
+    @PostMapping(value = "/articles/question")
+    public ResponseEntity<String> queryText(@org.springframework.web.bind.annotation.RequestBody Question question, Principal principal) {
+        try {
+            System.out.println("Data:" + question.getQuestion() + " " + question.getText());
+            try (PrintWriter out = new PrintWriter("python/question.txt")) {
+                out.print(question.getQuestion());
+            }
+            try (PrintWriter out = new PrintWriter("python/body.txt")) {
+                out.print(question.getText());
+            }
+            String answer = ProcessUtil.runScript("python3 python/test.py");
+            return new ResponseEntity<>(answer, HttpStatus.OK);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>("An Error Occurred", HttpStatus.OK);
         }
     }
 
