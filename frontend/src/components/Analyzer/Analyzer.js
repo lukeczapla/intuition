@@ -7,6 +7,7 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import endpoint from '../../endpoint';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
+import InputGroup from 'react-bootstrap/InputGroup';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
@@ -77,6 +78,8 @@ const Analyzer = (props) => {
     const [articlesTier1, setArticlesTier1] = useState(choose("articlesTier1"), []);
     const [articlesTier2, setArticlesTier2] = useState(choose("articlesTier2"), []);
     const [total, setTotal] = useState(choose("total"), 0);
+    const [question, setQuestion] = useState("");
+    const [answer, setAnswer] = useState("");
     const [key, setKey] = useState(choose("key"), "alteration");
 
     const [state, setState] = useState({
@@ -579,6 +582,17 @@ const Analyzer = (props) => {
         return "";
     }
 
+    const handleQuestion = () => {
+        if (question === "") return;
+        const body = {
+            question: question,
+            descriptor: variantSelected
+        };
+        fetch(endpoint + '/variant/question', {method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)}).then(result => result.text()).then(data => {
+            setAnswer(data);
+        });        
+    }
+
 
     return (
       <Container>
@@ -599,7 +613,8 @@ const Analyzer = (props) => {
                               <Form.Group className="mb-3" controlId="FormCheckbox1">
                                   <Form.Check type="checkbox" label="Submit and run analysis" onChange={() => setSubmitRun(!submitRun)} checked={submitRun} name="submitrun" />
                               </Form.Group>
-                              <Button type="submit" disabled={uploadFiles === null || createVariantKey === "" || processing}>Submit New Variants</Button></Form>
+                              <Button type="submit" disabled={uploadFiles === null || createVariantKey === "" || processing}>Submit New Variants</Button>
+                          </Form>
                       </Card.Text>
                   </Card.Body>
               </Card>
@@ -620,6 +635,16 @@ const Analyzer = (props) => {
           </Row>
           {variantSelected !== "" ?
           <>
+          {articleList.length > 0 && 
+            <>
+            <InputGroup>
+            <InputGroup.Text>Ask Question:</InputGroup.Text>
+              <Form.Control as="textarea" value={question} onChange={(e) => setQuestion(e.target.value)} aria-label="Question text" />
+            </InputGroup>
+            <Button variant="primary" onClick={handleQuestion}>Ask</Button>
+            {answer !== "" && <div>{answer}<br/><br/></div>}
+            </>
+          }
           <Row className="justify-content-md-center">
               <Col>Limit Possibly Relevant results display to
                   <Form.Select id="articleMax" name="topArticles" onChange={(e) => changeEvent(e)} value={topArticles}>

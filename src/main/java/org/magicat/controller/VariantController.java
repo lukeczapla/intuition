@@ -6,12 +6,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.magicat.model.*;
 import org.magicat.repository.ArticleRepository;
+import org.magicat.repository.FullTextRepository;
 import org.magicat.repository.ProjectListRepository;
 import org.magicat.repository.UserRepository;
 import org.magicat.repository.VariantRepository;
 import org.magicat.service.AnalyticsService;
 import org.magicat.service.TextService;
 import org.magicat.service.VariantService;
+import org.magicat.util.ProcessUtil;
 import org.magicat.util.SolrClientTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.security.Principal;
 import java.util.*;
@@ -40,6 +43,7 @@ public class VariantController {
 
     private final VariantRepository variantRepository;
     private final VariantService variantService;
+    private final FullTextRepository fullTextRepository;
     private final TextService textService;
     private final MongoTemplate mongoTemplate;
     private final ArticleRepository articleRepository;
@@ -48,10 +52,11 @@ public class VariantController {
     private final ProjectListRepository projectListRepository;
 
     @Autowired
-    public VariantController(VariantRepository variantRepository, VariantService variantService, TextService textService, MongoTemplate mongoTemplate,
+    public VariantController(VariantRepository variantRepository, VariantService variantService, FullTextRepository fullTextRepository, TextService textService, MongoTemplate mongoTemplate,
                              ArticleRepository articleRepository, AnalyticsService analyticsService, UserRepository userRepository, ProjectListRepository projectListRepository) {
         this.variantRepository = variantRepository;
         this.variantService = variantService;
+        this.fullTextRepository = fullTextRepository;
         this.textService = textService;
         this.mongoTemplate = mongoTemplate;
         this.articleRepository = articleRepository;
@@ -75,6 +80,40 @@ public class VariantController {
         @Override
         public int compareTo(SentencePage other) {
             return this.page - other.page;
+        }
+    }
+
+    @Secured("ROLE_USER")
+    @RequestMapping(value = "/variant/question", method = RequestMethod.POST)
+    public ResponseEntity<String> answerQuestion(@RequestBody Question question) {
+        Variant variant = variantRepository.findByDescriptor(question.getDescriptor());
+        List<String> articles = variant.getArticlesTier1();
+        try (PrintWriter out = new PrintWriter("question.txt")) {
+            out.print(question.getQuestion());
+        } catch (IOException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.EXPECTATION_FAILED);
+        }
+        try (PrintWriter out = new PrintWriter("pmids.txt")) {   
+            for (String pmid: articles) {
+                out.println(pmid);
+            }
+        } catch (IOException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.EXPECTATION_FAILED);
+        }
+        for (String pmid: articles) {
+            FullText ft = fullTextRepository.findFullTextFor(pmid);
+            String text = ft.getTextEntry();
+            try (PrintWriter out = new PrintWriter(pmid + ".txt")) {
+                out.println(text);
+            } catch (IOException e) {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.EXPECTATION_FAILED);
+            }          
+        }
+        try {
+            String answer = ProcessUtil.runScript("python3 python/rag_pmids.py");
+            return new ResponseEntity<>(answer, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.EXPECTATION_FAILED);
         }
     }
 

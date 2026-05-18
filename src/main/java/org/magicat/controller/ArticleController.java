@@ -29,6 +29,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -399,16 +400,16 @@ public class ArticleController {
 
     @ApiOperation(value = "Ask a question with text")
     @PostMapping(value = "/articles/question")
-    public ResponseEntity<String> queryText(@org.springframework.web.bind.annotation.RequestBody Question question, Principal principal) {
+    public ResponseEntity<String> queryText(@RequestBody Question question, Principal principal) {
         try {
-            System.out.println("Data:" + question.getQuestion() + " " + question.getText());
-            try (PrintWriter out = new PrintWriter("python/question.txt")) {
+            String argv = (int)(1000*Math.random()) + "";
+            try (PrintWriter out = new PrintWriter("python/question-" + argv + ".txt")) {
                 out.print(question.getQuestion());
             }
-            try (PrintWriter out = new PrintWriter("python/body.txt")) {
+            try (PrintWriter out = new PrintWriter("python/body-" + argv + ".txt")) {
                 out.print(question.getText());
             }
-            String answer = ProcessUtil.runScript("python3 python/test.py");
+            String answer = ProcessUtil.runScript("python3 python/rag_article.py " + argv);
             return new ResponseEntity<>(answer, HttpStatus.OK);
         } catch (IOException e) {
             log.error(e.getMessage());

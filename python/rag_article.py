@@ -1,13 +1,13 @@
 from pathlib import Path
+from sys import argv
 
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-
-BODY_FILE = "python/body.txt"
-QUESTION_FILE = "python/question.txt"
+BODY_FILE = f"python/body-{argv[1]}.txt"
+QUESTION_FILE = f"python/question-{argv[1]}.txt"
 
 CHROMA_DIR = "./chroma_db"
 
