@@ -5,9 +5,12 @@ RUN apt-get install -y npm maven
 RUN apt-get install -y python3
 RUN apt-get install -y python3-pip
 RUN apt-get install -y tesseract-ocr
-RUN pip3 install requests
 
 COPY . /app
+
+WORKDIR /app/python
+RUN pip install -r requirements.txt
+
 WORKDIR /app/frontend
 
 RUN cp package-server.json package.json
@@ -20,7 +23,7 @@ RUN cp -r build/* /app/src/main/webapp
 WORKDIR /app
 
 RUN mvn clean package -DskipTests
-RUN mv target/intuition-0.99.1.war .
+RUN mv target/intuition-0.100.1.war .
 
 CMD ["sh", "start.sh"]
 

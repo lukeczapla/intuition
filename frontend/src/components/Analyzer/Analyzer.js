@@ -6,6 +6,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import endpoint from '../../endpoint';
 import Tabs from 'react-bootstrap/Tabs';
+import Spinner from 'react-bootstrap/Spinner';
 import Tab from 'react-bootstrap/Tab';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Container from 'react-bootstrap/Container';
@@ -79,6 +80,7 @@ const Analyzer = (props) => {
     const [articlesTier2, setArticlesTier2] = useState(choose("articlesTier2"), []);
     const [total, setTotal] = useState(choose("total"), 0);
     const [question, setQuestion] = useState("");
+    const [processingQuestion, setProcessingQuestion] = useState(false);
     const [answer, setAnswer] = useState("");
     const [key, setKey] = useState(choose("key"), "alteration");
 
@@ -583,6 +585,7 @@ const Analyzer = (props) => {
     }
 
     const handleQuestion = () => {
+        setProcessingQuestion(true);
         if (question === "") return;
         const body = {
             question: question,
@@ -590,7 +593,8 @@ const Analyzer = (props) => {
         };
         fetch(endpoint + '/variant/question', {method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)}).then(result => result.text()).then(data => {
             setAnswer(data);
-        });        
+            setProcessingQuestion(false);
+        });
     }
 
 
@@ -641,8 +645,8 @@ const Analyzer = (props) => {
             <InputGroup.Text>Ask Question:</InputGroup.Text>
               <Form.Control as="textarea" value={question} onChange={(e) => setQuestion(e.target.value)} aria-label="Question text" />
             </InputGroup>
-            <Button variant="primary" onClick={handleQuestion}>Ask</Button>
-            {answer !== "" && <div>{answer}<br/><br/></div>}
+            <Button variant="primary" onClick={handleQuestion} disabled={processingQuestion}>Ask</Button>{processingQuestion && <Spinner animation="border" variant="success" role="status"></Spinner>}
+            {answer !== "" && <div><pre style={{"white-space": "pre-wrap"}}>{answer}</pre><br/><br/></div>}
             </>
           }
           <Row className="justify-content-md-center">

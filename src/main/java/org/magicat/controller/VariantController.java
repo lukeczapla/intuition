@@ -1,10 +1,25 @@
 package org.magicat.controller;
 
-import io.swagger.annotations.Api;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import org.magicat.model.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.magicat.model.Article;
+import org.magicat.model.FullText;
+import org.magicat.model.ProjectList;
+import org.magicat.model.Question;
+import org.magicat.model.TextAnalysis;
+import org.magicat.model.User;
+import org.magicat.model.Variant;
 import org.magicat.repository.ArticleRepository;
 import org.magicat.repository.FullTextRepository;
 import org.magicat.repository.ProjectListRepository;
@@ -13,7 +28,6 @@ import org.magicat.repository.VariantRepository;
 import org.magicat.service.AnalyticsService;
 import org.magicat.service.TextService;
 import org.magicat.service.VariantService;
-import org.magicat.util.ProcessUtil;
 import org.magicat.util.SolrClientTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,17 +36,38 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.security.Principal;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import dev.langchain4j.data.document.Document;
+import dev.langchain4j.data.document.Metadata;
+import dev.langchain4j.data.document.splitter.DocumentSplitters;
+import dev.langchain4j.data.embedding.Embedding;
+import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.model.chat.ChatModel;
+//import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
+import dev.langchain4j.store.embedding.EmbeddingMatch;
+import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
+import dev.langchain4j.store.embedding.EmbeddingStore;
+import dev.langchain4j.store.embedding.chroma.ChromaEmbeddingStore;
+import static dev.langchain4j.store.embedding.filter.MetadataFilterBuilder.metadataKey;
+import static dev.langchain4j.store.embedding.chroma.ChromaApiVersion.V2;
+import io.swagger.annotations.Api;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 @CrossOrigin(originPatterns = {"**"})
 @Api("Endpoints for getting Variant data and working with Variants lists and results for terms")
@@ -88,6 +123,105 @@ public class VariantController {
     public ResponseEntity<String> answerQuestion(@RequestBody Question question) {
         Variant variant = variantRepository.findByDescriptor(question.getDescriptor());
         List<String> articles = variant.getArticlesTier1();
+        List<String> fullTexts = new ArrayList<>();
+        for (String pmid: articles) {
+            FullText ft = fullTextRepository.findFullTextFor(pmid);
+            String text = ft.getTextEntry();
+            fullTexts.add(text);            
+        }
+
+        String apiKey = System.getenv("OPENAI_API_KEY");
+
+        EmbeddingModel embeddingModel = OpenAiEmbeddingModel.builder()
+                .apiKey(apiKey)
+                .modelName("text-embedding-3-small")
+                .build();
+
+        ChatModel chatModel = OpenAiChatModel.builder()
+                .apiKey(apiKey)
+                .modelName("gpt-4.1-mini")
+                .temperature(0.0)
+                .build();
+
+        EmbeddingStore<TextSegment> store = ChromaEmbeddingStore.builder()
+                .apiVersion(V2)
+                .baseUrl("http://localhost:8000")
+                .collectionName("pubmed_articles")
+                .build();
+
+        var splitter = DocumentSplitters.recursive(
+                1200,
+                200
+        );
+        for (int i = 0; i < articles.size(); i++) {
+            String pmid = articles.get(i);
+            String fullText = fullTexts.get(i);
+
+            Document document = Document.from(
+                    fullText,
+                    Metadata.from("pmid", pmid)
+            );
+
+            List<TextSegment> segments = splitter.split(document);
+
+            for (int j = 0; j < segments.size(); j++) {
+                segments.get(j).metadata().put("chunk", String.valueOf(j));
+            }
+
+            List<Embedding> embeddings = embeddingModel.embedAll(segments).content();
+
+            store.addAll(embeddings, segments);
+        }
+
+        // 2. Embed question once
+        Embedding questionEmbedding = embeddingModel.embed(question.getQuestion()).content();
+
+        List<EmbeddingMatch<TextSegment>> allMatches = new ArrayList<>();
+
+        // 3. Get top 5 chunks per PMID
+        for (String pmid: articles) {
+            EmbeddingSearchRequest request = EmbeddingSearchRequest.builder()
+                    .queryEmbedding(questionEmbedding)
+                    .maxResults(5)
+                    .filter(metadataKey("pmid").isEqualTo(pmid))
+                    .build();
+
+            allMatches.addAll(store.search(request).matches());
+        }
+
+        // 4. Combine all evidence into one context
+        StringBuilder context = new StringBuilder();
+
+        for (EmbeddingMatch<TextSegment> match : allMatches) {
+            TextSegment segment = match.embedded();
+
+            context.append("\n\n---\n")
+                    .append("[PMID: ")
+                    .append(segment.metadata().getString("pmid"))
+                    .append(", chunk: ")
+                    .append(segment.metadata().getString("chunk"))
+                    .append("]\n")
+                    .append(segment.text());
+        }
+
+        String prompt = """
+                Answer the question using only the article excerpts below.
+
+                Cite every factual claim using the PMID from the relevant excerpt, in this format:
+                [PMID: 12345678]
+
+                Question:
+                %s
+
+                Article excerpts:
+                %s
+                """.formatted(question.getQuestion(), context);
+
+        return new ResponseEntity<>(chatModel.chat(prompt), HttpStatus.OK);
+    }
+        /*
+        Variant variant = variantRepository.findByDescriptor(question.getDescriptor());
+        List<String> articles = variant.getArticlesTier1();
         try (PrintWriter out = new PrintWriter("question.txt")) {
             out.print(question.getQuestion());
         } catch (IOException e) {
@@ -114,8 +248,7 @@ public class VariantController {
             return new ResponseEntity<>(answer, HttpStatus.OK);
         } catch (IOException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.EXPECTATION_FAILED);
-        }
-    }
+        }*/
 
     @Secured("ROLE_USER")
     @RequestMapping(value = "/variant/textAnalysis", method = RequestMethod.POST)

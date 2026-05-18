@@ -3,6 +3,8 @@ import endpoint from '../../endpoint.js';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import FormControl from 'react-bootstrap/FormControl';
+import InputGroup from 'react-bootstrap/InputGroup';
+import Spinner from 'react-bootstrap/Spinner';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
@@ -22,6 +24,7 @@ const Article = (props) => {
   const [PMIDSupporting, setPMIDSupporting] = useState([]);
   const [PMIDSelected, setPMIDSelected] = useState("");
   const [uploadFiles, setUploadFiles] = useState(null);
+  const [processingQuestion, setProcessingQuestion] = useState(false);
   const formRef = createRef();
 
   useEffect(() => {
@@ -66,12 +69,14 @@ const Article = (props) => {
 
   const runQuery = () => {
     if (query !== "") {
+      setProcessingQuestion(true);
       let formData = {
         text: article.fulltext,
         question: query
       };
       fetch(endpoint + "/articles/question", {method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData)}).then(response => response.text()).then(data => {
         setAnswer(data);
+        setProcessingQuestion(false);
       });
     }
   }
@@ -188,10 +193,11 @@ const Article = (props) => {
             </Row>
             {article.fulltext != null ?
                 <>
-                  <Row>
-                  <FormControl onChange={(e) => setQuery(e.target.value)} value={query} aria-label="Question" aria-describedby="basic-addon1" placeholder="Question to Ask" />
-                  <Button variant="outline-dark" onClick={() => runQuery()}>Ask Question</Button>
-                  </Row>
+                  <InputGroup>
+                  <InputGroup.Text>Ask Question:</InputGroup.Text>
+                  <Form.Control as="textarea" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Question text" />
+                  </InputGroup>
+                  <Button variant="primary" onClick={runQuery} disabled={processingQuestion}>Ask</Button>{processingQuestion && <Spinner animation="border" variant="success" role="status"></Spinner>}
                   {answer != "" &&
                     <Row>
                       <b>Answer:</b>

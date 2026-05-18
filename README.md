@@ -3,6 +3,7 @@
 # Latest version of curation demonstration frontend
 
 ## RECENT CHANGES:
+ChromaDB has been added for vector embedding and search for question/answer, either individual articles or for curated variants with the Top 5 articles ("tier 1") - this allows for retrieving answers with the proper PMID citation, based on the highest scoring articles.
 Google OAuth2 is activated for authentication and the /conf/usergoogle endpoint used to transmit the user email and TokenId provided by Google for validation.
 The LDAP/SAML was deactivated, now uses the Google login through LoginModal popup with the Google sign-in button.
 Lastly, the endpoint is now "/intuition", it is true that curators rely on intuition about repeated observations from reading the text as a career, that is/has been the most profitable way to find functional sentences in the demo frontend.
