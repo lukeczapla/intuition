@@ -81,6 +81,7 @@ const Analyzer = (props) => {
     const [total, setTotal] = useState(choose("total"), 0);
     const [question, setQuestion] = useState("");
     const [processingQuestion, setProcessingQuestion] = useState(false);
+    const [additionalArticles, setAdditionalArticles] = useState(0);
     const [answer, setAnswer] = useState("");
     const [key, setKey] = useState(choose("key"), "alteration");
 
@@ -204,6 +205,8 @@ const Analyzer = (props) => {
             setArticleList2([]);
             setArticleRecords([]);
             setTextAnalysis(null);
+            //setQuestion("");
+            //setAnswer("");
 
             loadVariant(e.target.value);
         }
@@ -589,7 +592,8 @@ const Analyzer = (props) => {
         if (question === "") return;
         const body = {
             question: question,
-            descriptor: variantSelected
+            descriptor: variantSelected,
+            additional: parseInt(additionalArticles),
         };
         fetch(endpoint + '/variant/question', {method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)}).then(result => result.text()).then(data => {
             setAnswer(data);
@@ -645,6 +649,8 @@ const Analyzer = (props) => {
             <InputGroup.Text>Ask Question:</InputGroup.Text>
               <Form.Control as="textarea" value={question} onChange={(e) => setQuestion(e.target.value)} aria-label="Question text" />
             </InputGroup>
+            <Form.Label>Include More Articles ({additionalArticles})</Form.Label>
+            <Form.Range value={additionalArticles} onChange={(e) => setAdditionalArticles(e.target.value)} min="0" max="10" step="1" />
             <Button variant="primary" onClick={handleQuestion} disabled={processingQuestion}>Ask</Button>{processingQuestion && <Spinner animation="border" variant="success" role="status"></Spinner>}
             {answer !== "" && <div><pre style={{"white-space": "pre-wrap"}}>{answer}</pre><br/><br/></div>}
             </>

@@ -122,12 +122,19 @@ public class VariantController {
     @RequestMapping(value = "/variant/question", method = RequestMethod.POST)
     public ResponseEntity<String> answerQuestion(@RequestBody Question question) {
         Variant variant = variantRepository.findByDescriptor(question.getDescriptor());
-        List<String> articles = variant.getArticlesTier1();
+        List<String> articleSet = variant.articleList();
+
         List<String> fullTexts = new ArrayList<>();
-        for (String pmid: articles) {
-            FullText ft = fullTextRepository.findFullTextFor(pmid);
+        List<String> articles = new ArrayList<>();
+        Integer additional = question.getAdditional() == null ? 0 : question.getAdditional();
+        int total = 0;
+        for (int i = 0; total < 5 + additional && i < articleSet.size(); i++) {
+            FullText ft = fullTextRepository.findFullTextFor(articleSet.get(i));
             String text = ft.getTextEntry();
-            fullTexts.add(text);            
+            if (text == null) continue;
+            total++;
+            fullTexts.add(text);
+            articles.add(articleSet.get(i));
         }
 
         String apiKey = System.getenv("OPENAI_API_KEY");
@@ -139,7 +146,7 @@ public class VariantController {
 
         ChatModel chatModel = OpenAiChatModel.builder()
                 .apiKey(apiKey)
-                .modelName("gpt-4.1-mini")
+                .modelName("gpt-5.4-mini") // "gpt-4.1-mini"
                 .temperature(0.0)
                 .build();
 

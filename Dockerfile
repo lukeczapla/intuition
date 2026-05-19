@@ -21,6 +21,7 @@ RUN npm run-script build
 RUN cp -r build/* /app/src/main/webapp
 
 WORKDIR /app
+ENV OPENAI_API_KEY="<your api key>"
 
 RUN mvn clean package -DskipTests
 RUN mv target/intuition-0.100.1.war .
