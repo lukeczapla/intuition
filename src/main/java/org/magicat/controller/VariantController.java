@@ -121,17 +121,28 @@ public class VariantController {
     @Secured("ROLE_USER")
     @RequestMapping(value = "/variant/question", method = RequestMethod.POST)
     public ResponseEntity<String> answerQuestion(@RequestBody Question question) {
+        String modelName = "text-embedding-3-small";
+
         Variant variant = variantRepository.findByDescriptor(question.getDescriptor());
         List<String> articleSet = variant.articleList();
 
         List<String> fullTexts = new ArrayList<>();
         List<String> articles = new ArrayList<>();
+        List<Boolean> indexed = new ArrayList<>();
         Integer additional = question.getAdditional() == null ? 0 : question.getAdditional();
         int total = 0;
         for (int i = 0; total < 5 + additional && i < articleSet.size(); i++) {
             FullText ft = fullTextRepository.findFullTextFor(articleSet.get(i));
             String text = ft.getTextEntry();
             if (text == null) continue;
+            if (ft.getIndexedChroma() != null && ft.getIndexedChroma() && ft.getEmbeddingModel() != null && ft.getEmbeddingModel() == modelName) {
+                indexed.add(true);
+            } else {
+                indexed.add(false);
+                ft.setIndexedChroma(true);
+                ft.setEmbeddingModel(modelName);
+                fullTextRepository.save(ft);
+            }
             total++;
             fullTexts.add(text);
             articles.add(articleSet.get(i));
@@ -141,7 +152,7 @@ public class VariantController {
 
         EmbeddingModel embeddingModel = OpenAiEmbeddingModel.builder()
                 .apiKey(apiKey)
-                .modelName("text-embedding-3-small")
+                .modelName(modelName)
                 .build();
 
         ChatModel chatModel = OpenAiChatModel.builder()
@@ -160,9 +171,13 @@ public class VariantController {
                 1200,
                 200
         );
+
+
         for (int i = 0; i < articles.size(); i++) {
             String pmid = articles.get(i);
             String fullText = fullTexts.get(i);
+
+            if (indexed.get(i)) continue;
 
             Document document = Document.from(
                     fullText,
@@ -180,12 +195,12 @@ public class VariantController {
             store.addAll(embeddings, segments);
         }
 
-        // 2. Embed question once
+        // Embed question once
         Embedding questionEmbedding = embeddingModel.embed(question.getQuestion()).content();
 
         List<EmbeddingMatch<TextSegment>> allMatches = new ArrayList<>();
 
-        // 3. Get top 5 chunks per PMID
+        // Get top 5 chunks per PMID
         for (String pmid: articles) {
             EmbeddingSearchRequest request = EmbeddingSearchRequest.builder()
                     .queryEmbedding(questionEmbedding)
@@ -196,7 +211,7 @@ public class VariantController {
             allMatches.addAll(store.search(request).matches());
         }
 
-        // 4. Combine all evidence into one context
+        // Combine all data into one context
         StringBuilder context = new StringBuilder();
 
         for (EmbeddingMatch<TextSegment> match : allMatches) {
@@ -226,36 +241,6 @@ public class VariantController {
 
         return new ResponseEntity<>(chatModel.chat(prompt), HttpStatus.OK);
     }
-        /*
-        Variant variant = variantRepository.findByDescriptor(question.getDescriptor());
-        List<String> articles = variant.getArticlesTier1();
-        try (PrintWriter out = new PrintWriter("question.txt")) {
-            out.print(question.getQuestion());
-        } catch (IOException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.EXPECTATION_FAILED);
-        }
-        try (PrintWriter out = new PrintWriter("pmids.txt")) {   
-            for (String pmid: articles) {
-                out.println(pmid);
-            }
-        } catch (IOException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.EXPECTATION_FAILED);
-        }
-        for (String pmid: articles) {
-            FullText ft = fullTextRepository.findFullTextFor(pmid);
-            String text = ft.getTextEntry();
-            try (PrintWriter out = new PrintWriter(pmid + ".txt")) {
-                out.println(text);
-            } catch (IOException e) {
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.EXPECTATION_FAILED);
-            }          
-        }
-        try {
-            String answer = ProcessUtil.runScript("python3 python/rag_pmids.py");
-            return new ResponseEntity<>(answer, HttpStatus.OK);
-        } catch (IOException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.EXPECTATION_FAILED);
-        }*/
 
     @Secured("ROLE_USER")
     @RequestMapping(value = "/variant/textAnalysis", method = RequestMethod.POST)

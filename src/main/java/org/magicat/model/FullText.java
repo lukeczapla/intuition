@@ -1,9 +1,9 @@
 package org.magicat.model;
 
 import lombok.ToString;
-import org.bson.types.Binary;
+//import org.bson.types.Binary;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.TextIndexed;
+//import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @ToString
@@ -21,6 +21,25 @@ public class FullText {
     private String HTMLEntry;
 
     private String documentResourceId;
+
+    private Boolean indexedChroma;
+    private String embeddingModel;
+
+    public String getEmbeddingModel() {
+        return embeddingModel;
+    }
+
+    public void setEmbeddingModel(String model) {
+        this.embeddingModel = model;
+    }
+
+    public Boolean getIndexedChroma() {
+        return indexedChroma;
+    }
+
+    public void setIndexedChroma(boolean value) {
+        this.indexedChroma = value;
+    }
 
     public String getPmId() {
         return pmId;
